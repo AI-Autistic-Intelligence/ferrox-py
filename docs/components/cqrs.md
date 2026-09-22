@@ -1,22 +1,34 @@
-# CQRS Component
+# CQRS, Events e Sagas Component
 
-## 1. Philosophy / Purpose
-Separation of Concerns.
+In architetture Enterprise e Microservizi complessi, i Controller non dovrebbero chiamare direttamente i Repository, ma dovrebbero lanciare Comandi o Query. `ferrox-py` fornisce pattern integrati per la segregazione.
 
-## 2. Architectural Layering
-Layer 7.
+## 1. CommandBus & QueryBus (CQRS)
+Il pattern Command Query Responsibility Segregation disaccoppia chi esegue la mutazione di stato (Command) da chi legge i dati (Query).
 
-## 3. How it Works (Under the hood)
-Command/Query/Event Buses.
+```python
+from ferrox_py.cqrs.bus import CommandBus
 
-## 4. Why it was designed this way
-Scalability.
+# 1. Definizione
+class CreateOrderCommand:
+    def __init__(self, item_id: str):
+        self.item_id = item_id
 
-## 5. Usage Guide & Code Examples
-`bus.execute()`
+# 2. Registrazione e Dispatch
+bus = CommandBus()
+# Registra un handler che sa come processare CreateOrderCommand
+bus.register_handler(CreateOrderCommand, order_service.create_order)
 
-## 6. Anti-Patterns
-Mixing commands and queries.
+# L'API invia il comando
+result = bus.dispatch(CreateOrderCommand(item_id="12345"))
+```
 
-## 7. Pro-Tips / Best Practices
-Keep handlers small.
+## 2. Event Dispatcher
+Architettura Event-Driven. Quando si completa una transazione (es. Pagamento), viene scaturito un Evento. Chiunque sia sottoscritto (`Subscriber`) reagisce asincronamente. In `ferrox-py` il Bus è in memoria, ma estendibile su Redis Pub/Sub o RabbitMQ.
+
+## 3. Sagas (Transazioni Distribuite)
+Le Sagas sono una sequenza di transazioni locali. Se una fallisce (es. pagamento fallito, ma ordine creato), il motore esegue i passi compensativi per annullare le transazioni locali precedenti.
+
+```python
+# L'orchestratore sa come annullare (rollback) un comando.
+# Ideale per scenari serverless o microservizi su database diversi.
+```
