@@ -1,25 +1,50 @@
 # Web & Transports Component
 
-Il modulo web di `ferrox-py` non impone FastAPI, sebbene sia fortemente consigliato per la validazione automatica dei tipi. Invece, funge da proxy agnostico (API Gateway / Transport Layer).
+## 1. Overview (What does this do?)
+The Web component in `ferrox-py` acts as an agnostic API Gateway and Transport Layer. It is responsible for parsing incoming network requests across multiple protocols, passing them through the strict 7-Layer Onion Pipeline, and routing them to the appropriate application Controllers.
 
-## 1. Architettura Multi-Trasporto
-`ferrox-py` supporta l'esecuzione simultanea di più trasporti (server) nello stesso ciclo di vita:
-- **HTTP REST / API Gateway**: Gestione classica con decoratori.
-- **WebSockets / SSE (Server-Sent Events)**: Stream real-time gestiti da router specializzati.
-- **GraphQL**: Schema generati e integrati (ad es. Strawberry o Graphene).
+## 2. Philosophy (Why does it exist?)
+Many frameworks tightly couple their business logic to HTTP abstractions (like raw `request` objects). `ferrox-py`'s philosophy is to treat the transport layer as merely a delivery mechanism. Whether a command arrives via an HTTP REST call, a WebSocket message, or a GraphQL query, the underlying business logic remains completely isolated and agnostic to the network protocol.
 
-## 2. Decorators & Pipes
-Ogni endpoint beneficia dei decoratori integrati che eseguono logiche *prima* che l'handler venga invocato (Onion Request Pipeline).
-- `@require_roles("admin")`: Controlla il RBAC.
-- `@validate_schema(MyPydanticModel)`: Valida il body e lancia eccezioni `400 Bad Request` in caso di difetto.
+## 3. Target Audience (Who is it for?)
+This module is for developers building multi-protocol APIs. If your application needs to expose a traditional REST API for mobile clients, a GraphQL endpoint for internal frontends, and WebSockets for real-time notifications—all sharing the exact same business logic—this component manages that complexity safely.
 
-## 3. Custom Transports
-Se un servizio richiede un protocollo speciale (es. TCP Raw o file-based trigger), l'implementazione del trasporto base (`ferrox_py.transports.base`) permette di inserire il nuovo server nell'Application loop.
+## 4. Architecture (How does it work?)
+- **Multi-Transport Architecture**: The application can run multiple servers (transports) simultaneously within the same asyncio event loop.
+- **REST / API Gateway**: While agnostic, it strongly integrates with FastAPI as the default HTTP engine to leverage automatic OpenAPI schema generation and Pydantic type validation.
+- **WebSockets / SSE**: Specialized routers handle real-time streaming and Server-Sent Events.
+- **Decorators**: The component provides unified decorators (`@require_roles`, `@validate_schema`) that inject logic *before* the handler runs, regardless of the underlying transport.
+- **Custom Transports**: Developers can implement the `ferrox_py.transports.base` interface to add entirely new triggers (e.g., raw TCP servers, message queue consumers, or file-system watchers).
+
+## 5. Installation / Setup
+To run the default HTTP REST gateway, FastAPI and an ASGI server (like Uvicorn) are required. GraphQL support requires additional libraries like Strawberry.
+
+```bash
+pip install fastapi uvicorn pydantic
+# Optional: pip install strawberry-graphql
+```
+
+## 6. Quickstart (Usage)
+Defining a controller and applying decorators:
 
 ```python
-# Aggiungere un datagrid parser alle tue route
-from ferrox_py.transports.datagrid import parse_ag_grid_query
+from ferrox_py.web.decorators import require_roles, validate_schema
+from pydantic import BaseModel
 
-# Il request url "/users?sort=name:asc" viene parsato e mappato per SQLAlchemy automaticamente
-query_opts = parse_ag_grid_query(request.url)
+class UserPayload(BaseModel):
+    name: str
+
+# These decorators hook into the Onion Pipeline automatically
+@require_roles("admin")
+@validate_schema(UserPayload)
+async def create_user_handler(payload: UserPayload):
+    # At this point, the user is an admin and the payload is guaranteed valid
+    return {"message": f"User {payload.name} created successfully."}
+
+# Custom utilities are also provided, e.g., parsing DataGrid queries:
+from ferrox_py.transports.datagrid import parse_ag_grid_query
+# query_opts = parse_ag_grid_query(request.url)
 ```
+
+## 7. Ecosystem Integration
+The Web component is the entry point for external data and therefore integrates directly with the **Security** component (to evaluate headers and tokens), the **Pipes/Interceptors** (for validating schemas), and the **Observability** component (to extract and log Correlation IDs from incoming requests).

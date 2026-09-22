@@ -1,34 +1,47 @@
-# CQRS, Events e Sagas Component
+# CQRS, Events, and Sagas Component
 
-In architetture Enterprise e Microservizi complessi, i Controller non dovrebbero chiamare direttamente i Repository, ma dovrebbero lanciare Comandi o Query. `ferrox-py` fornisce pattern integrati per la segregazione.
+## 1. Overview (What does this do?)
+The CQRS (Command Query Responsibility Segregation) component provides integrated patterns for separating read operations (Queries) from write operations (Commands). It also provides an Event Dispatcher for Event-Driven Architectures and supports Sagas for managing distributed transactions across multiple microservices or database boundaries.
 
-## 1. CommandBus & QueryBus (CQRS)
-Il pattern Command Query Responsibility Segregation disaccoppia chi esegue la mutazione di stato (Command) da chi legge i dati (Query).
+## 2. Philosophy (Why does it exist?)
+In complex Enterprise architectures and microservices, having Controllers directly call Repositories to mutate state leads to tightly coupled, hard-to-maintain code. By forcing mutations through a Command Bus and reads through a Query Bus, `ferrox-py` enforces a clear separation of concerns. This allows read paths to be optimized (e.g., using caching or read replicas) entirely independently of the write paths, and enables reactive event-driven flows.
 
+## 3. Target Audience (Who is it for?)
+This component is designed for advanced architects and developers building complex, highly scalable systems. It is specifically aimed at those implementing Domain-Driven Design (DDD) and those who need to orchestrate complex business transactions that span multiple services without relying on distributed two-phase commits.
+
+## 4. Architecture (How does it work?)
+- **Command/Query Bus**: Resolves incoming Commands/Queries to their registered Handlers.
+- **Event Dispatcher**: An in-memory Pub/Sub bus where Publishers emit Events (e.g., `PaymentCompleted`) and Subscribers asynchronously react to them. It is designed to be easily extensible to external message brokers like Redis Pub/Sub or RabbitMQ.
+- **Sagas**: A state machine engine that executes a sequence of local transactions. If one step fails, the Saga orchestrator automatically triggers compensating actions (rollbacks) for all previously successful steps.
+
+## 5. Installation / Setup
+The in-memory CQRS and Event buses are included natively in `ferrox-py`. For distributed messaging (e.g., RabbitMQ or Redis), additional specific driver packages must be installed and configured within the IoC Container.
+
+## 6. Quickstart (Usage)
 ```python
 from ferrox_py.cqrs.bus import CommandBus
 
-# 1. Definizione
+# 1. Define the Command
 class CreateOrderCommand:
     def __init__(self, item_id: str):
         self.item_id = item_id
 
-# 2. Registrazione e Dispatch
+# 2. Define the Handler logic (mocked)
+class OrderService:
+    def create_order(self, cmd: CreateOrderCommand):
+        print(f"Order created for item {cmd.item_id}")
+        return True
+
+# 3. Registration and Dispatch
 bus = CommandBus()
-# Registra un handler che sa come processare CreateOrderCommand
+order_service = OrderService()
+
+# Register the handler that knows how to process the Command
 bus.register_handler(CreateOrderCommand, order_service.create_order)
 
-# L'API invia il comando
+# The API Controller simply dispatches the command
 result = bus.dispatch(CreateOrderCommand(item_id="12345"))
 ```
 
-## 2. Event Dispatcher
-Architettura Event-Driven. Quando si completa una transazione (es. Pagamento), viene scaturito un Evento. Chiunque sia sottoscritto (`Subscriber`) reagisce asincronamente. In `ferrox-py` il Bus è in memoria, ma estendibile su Redis Pub/Sub o RabbitMQ.
-
-## 3. Sagas (Transazioni Distribuite)
-Le Sagas sono una sequenza di transazioni locali. Se una fallisce (es. pagamento fallito, ma ordine creato), il motore esegue i passi compensativi per annullare le transazioni locali precedenti.
-
-```python
-# L'orchestratore sa come annullare (rollback) un comando.
-# Ideale per scenari serverless o microservizi su database diversi.
-```
+## 7. Ecosystem Integration
+CQRS integrates heavily with the **Data Component** (for actual persistence executed by the Handlers) and the **Pipes/Interceptors**. Specifically, a Validation Pipe is often attached to the Command Bus to ensure that every Command object is structurally valid before it ever reaches the Business Service layer.

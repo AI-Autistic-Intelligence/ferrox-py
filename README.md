@@ -1,58 +1,59 @@
 # ⚡ Ferrox-Py (Core Framework)
 
 <p align="center">
-  <b>Un framework Python 3.11+ per il Server-Side Enterprise</b><br/>
-  <i>Ispirato alla robustezza di Rust-Ferrox, porta l'Inversion of Control, la Modularità e l'Architettura a Cipolla nel mondo Python.</i>
+  <b>A Python 3.11+ Framework for Enterprise Server-Side Development</b><br/>
+  <i>Inspired by the robustness of Rust-Ferrox, bringing Inversion of Control, Modularity, and Onion Architecture to the Python ecosystem.</i>
 </p>
 
 ---
 
-## 1. Cosa fa questo pacchetto? (Overview)
-`ferrox-py` è il cuore dell'ecosistema Ferrox per Python. Fornisce il container di Inversion of Control (IoC), il sistema di Dependency Injection (DI) e la struttura fondamentale per sviluppare backend robusti, scalabili e disaccoppiati in Python. Non è solo un framework web, ma un gestore dell'intero ciclo di vita dell'applicazione, supportando contemporaneamente API REST, GraphQL, background jobs e code di eventi.
+## 1. Overview (What does this do?)
+`ferrox-py` is the core foundation of the Ferrox ecosystem for Python. It provides an Inversion of Control (IoC) container, a Dependency Injection (DI) system, and the fundamental structure required to develop robust, scalable, and decoupled backend applications in Python. It goes beyond being just a web framework; it serves as a complete application lifecycle manager that simultaneously supports REST APIs, GraphQL, background jobs, and event queues.
 
-## 2. Perché usare Ferrox-Py? (Filosofia)
-Nel moderno sviluppo backend in Python (spesso dominato da script monolitici o framework troppo permissivi), le decisioni architetturali tendono a frammentarsi. Ferrox-Py nasce per risolvere il problema del debito tecnico nei progetti complessi, imponendo:
-- **Disaccoppiamento netto** tra logica di dominio (Business Layer) e protocollo di trasporto (HTTP, gRPC, Code).
-- **Gestione sicura dello stato** tramite container IoC centralizzati.
-- **Validazione rigorosa** all'ingresso (tramite Pydantic).
+## 2. Philosophy (Why does it exist?)
+Modern backend development in Python is often plagued by monolithic scripts or overly permissive frameworks, causing architectural decisions to fragment over time. Ferrox-Py was created to mitigate the technical debt inherent in complex projects by enforcing:
+- **Strict Decoupling** between domain logic (Business Layer) and the transport protocol (HTTP, gRPC, Queues).
+- **Secure State Management** through centralized IoC containers.
+- **Rigorous Validation** upon entry (leveraging Pydantic).
+- **Mitigation of Abuse** by strictly separating side effects and enforcing robust architectural boundaries.
 
-## 3. A chi si rivolge?
-È pensato per **Data Platform**, **SaaS Enterprise** e **Architetture a Microservizi** dove la sicurezza, la prevedibilità del codice e la manutenibilità a lungo termine sono critiche. Se hai bisogno di un sistema che scali assieme al tuo team senza diventare un groviglio di codice, Ferrox-Py è la scelta ideale.
+## 3. Target Audience (Who is it for?)
+This framework is specifically designed for **Data Platforms**, **Enterprise SaaS**, and **Microservices Architectures** where security, code predictability, and long-term maintainability are absolutely critical. If you need a system that seamlessly scales alongside your team without degrading into a convoluted "spaghetti code" architecture, Ferrox-Py is the ideal choice.
 
-## 4. Come funziona? (Architettura)
-Ferrox-Py adotta fedelmente la **7-Layer Onion Request Pipeline** dell'ecosistema Ferrox originale:
-1. **Security & Headers**: Intercettazione iniziale e sanificazione.
-2. **Defesa Attiva & Rate Limiting**: Protezione preventiva contro gli abusi.
-3. **Auth Guards**: Estrazione e validazione dei token (JWT/PASETO).
-4. **RBAC & ZK Proofs**: Controllo rigoroso degli accessi basato sui ruoli.
-5. **Validation Pipe**: Controllo formale del payload DTO (Data Transfer Object).
-6. **Controller Layer**: Traduzione del trasporto in linguaggio di dominio.
-7. **Business Service / CQRS**: Esecuzione della logica di dominio e persistenza.
+## 4. Architecture (How does it work?)
+Ferrox-Py faithfully adopts the **7-Layer Onion Request Pipeline** from the original Ferrox ecosystem:
+1. **Security & Headers**: Initial interception and sanitization of incoming requests.
+2. **Active Defense & Rate Limiting**: Preemptive protection against system abuse.
+3. **Auth Guards**: Extraction and strict validation of authentication tokens (JWT/PASETO).
+4. **RBAC & ZK Proofs**: Rigorous Role-Based Access Control and zero-knowledge mechanisms.
+5. **Validation Pipe**: Formal checking of the DTO (Data Transfer Object) payload.
+6. **Controller Layer**: Translation of the transport protocol into the specific domain language.
+7. **Business Service / CQRS**: Execution of domain logic, state mutations, and persistence.
 
-## 5. Come si installa?
-Assicurati di utilizzare Python 3.11+.
+## 5. Installation / Setup
+To run `ferrox-py`, ensure you have an environment with **Python 3.11+**. No prior configuration is required, but it is highly recommended to use a virtual environment.
 
 ```bash
-# Esempio di installazione in locale (sviluppo)
+# Example local installation (development mode)
 pip install -e .
 ```
+The project also exposes the `ferrox` CLI for utilities and basic administrative tasks.
 
-Il progetto espone anche la CLI `ferrox` per utility e task di base.
-
-## 6. Come si usa? (Quickstart)
+## 6. Quickstart (Usage)
+Below is a minimal setup using Python 3.11+ to initialize the application and its dependency container:
 
 ```python
 from ferrox_py.core.app import FerroxApp
 from ferrox_py.core.container import Container
 
 def main():
-    # Inizializza il container IoC
+    # Initialize the IoC container
     container = Container()
     
-    # Registra i tuoi servizi e i controller
-    # container.register("mio_servizio", MioServizio)
+    # Register your services and controllers here
+    # container.register("my_service", MyService)
     
-    # Costruisce e avvia l'applicazione
+    # Build and start the Ferrox application
     app = FerroxApp(container)
     app.start()
 
@@ -60,8 +61,8 @@ if __name__ == "__main__":
     main()
 ```
 
-## 7. L'Ecosistema Ferrox-Py
-Il Core è progettato per essere esteso da pacchetti specializzati:
-- 🛠️ [ferrox-py-utils](../ferrox-py-utils) - Strumenti ETL, pipeline dati e connettori (S3, CSV).
-- 🔒 [ferrox-py-auth](../ferrox-py-auth) - Gestione IAM, SSO, RBAC e compliance GDPR.
-- 💳 [ferrox-py-commerce](../ferrox-py-commerce) - Integrazioni Stripe/PayPal, Webhooks e idempoteza.
+## 7. Ecosystem Integration
+The Core module is intentionally designed to act as a hub that can be seamlessly extended by specialized packages:
+- 🛠️ **ferrox-py-utils**: Integration for ETL tools, data pipelines, and connectors (e.g., S3, CSV).
+- 🔒 **ferrox-py-auth**: Integrates IAM, SSO, RBAC, and GDPR compliance features directly into the Auth Guards layer.
+- 💳 **ferrox-py-commerce**: Interfaces with Stripe/PayPal webhooks and enforces idempotency in the Transaction State.
