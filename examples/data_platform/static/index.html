@@ -19,6 +19,7 @@
             --accent-green: #10b981;
             --accent-purple: #8b5cf6;
             --accent-pink: #ec4899;
+            --accent-orange: #f59e0b;
             --danger: #ef4444;
         }
         body {
@@ -147,6 +148,7 @@
         .log-info { color: var(--accent-cyan); }
         .log-success { color: var(--accent-green); }
         .log-warn { color: #f59e0b; }
+        .log-danger { color: var(--danger); font-weight: bold; }
 
         /* DAG PIPELINE */
         .dag-container {
@@ -179,11 +181,28 @@
             box-shadow: 0 0 10px var(--accent-green);
             animation: pulse 1.5s infinite;
         }
+        .pulse-dot.danger {
+            background-color: var(--danger);
+            box-shadow: 0 0 10px var(--danger);
+        }
 
         @keyframes pulse {
             0% { opacity: 0.5; }
             50% { opacity: 1; }
             100% { opacity: 0.5; }
+        }
+        
+        .progress-bar-bg {
+            height: 8px;
+            background: var(--bg-panel);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--danger), var(--accent-green));
+            transition: width 0.3s ease;
         }
     </style>
 </head>
@@ -191,34 +210,37 @@
 
     <header>
         <div>
-            <h1>Ferrox Data Platform</h1>
-            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Command Center & Live Telemetry</div>
+            <h1>Ferrox Quantitative Market Surveillance</h1>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Live AI Telemetry & Data Platform Pipeline</div>
         </div>
         <div class="header-meta">
             <div><strong>Environment:</strong> Production</div>
-            <div><strong>Region:</strong> eu-central-1</div>
-            <div class="badge">● Cluster Healthy</div>
+            <div><strong>Engine:</strong> pandas + numpy</div>
+            <div class="badge">● DAG Healthy</div>
         </div>
     </header>
 
     <div class="dashboard-grid">
         <!-- METRICS ROW -->
         <div class="panel metric-card" style="border-top: 3px solid var(--accent-cyan);">
-            <div class="panel-title">Bitcoin Ingestion (Binance WS) <span class="pulse-dot"></span></div>
+            <div class="panel-title">Multiplexed Feed (Binance) <span class="pulse-dot"></span></div>
             <div class="metric-value" id="btc-price">---</div>
-            <div class="metric-sub">Events processed: <span id="event-count" style="color: var(--text-main);">0</span></div>
+            <div class="metric-sub">Events Processed: <span id="event-count" style="color: var(--text-main);">0</span></div>
         </div>
 
         <div class="panel metric-card" style="border-top: 3px solid var(--accent-purple);">
-            <div class="panel-title">Global Environment (Open-Meteo)</div>
-            <div class="metric-value" id="weather-temp">---</div>
-            <div class="metric-sub" id="weather-meta">Fetching telemetry...</div>
+            <div class="panel-title">Whale Anomaly Radar</div>
+            <div class="metric-value" id="whale-zscore">---</div>
+            <div class="metric-sub" id="whale-status">Scanning volumes (Log-Normal)...</div>
         </div>
 
-        <div class="panel metric-card" style="border-top: 3px solid var(--accent-pink);">
-            <div class="panel-title">DevOps Infrastructure (GitHub)</div>
-            <div class="metric-value" id="github-status" style="font-size: 1.5rem; margin-top: 10px;">---</div>
-            <div class="metric-sub" style="margin-top: auto;">REST API Health Check</div>
+        <div class="panel metric-card" style="border-top: 3px solid var(--danger);">
+            <div class="panel-title">Order Book Imbalance (Spoofing)</div>
+            <div class="metric-value" id="obi-value" style="font-size: 1.5rem; margin-top: 10px;">---</div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="obi-bar" style="width: 50%;"></div>
+            </div>
+            <div class="metric-sub" id="obi-status" style="margin-top: 10px;">Neutral</div>
         </div>
 
         <!-- MAIN CHART -->
@@ -234,34 +256,13 @@
         <!-- SIDE PANELS: LOGS & DAG -->
         <div class="side-panel">
             <div class="panel" style="flex: 1;">
-                <div class="panel-title">ETL Orchestrator (DAG Engine)</div>
-                <div class="dag-container">
-                    <div class="dag-node success" id="node-extract">
-                        <div>
-                            <div style="font-size: 0.85rem; font-weight: 600;">Extract (Users & Sales)</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">Concurrency: 2 workers</div>
-                        </div>
-                        <span style="color: var(--accent-green); font-size: 0.8rem;">DONE</span>
-                    </div>
-                    <div class="dag-node active" id="node-transform">
-                        <div>
-                            <div style="font-size: 0.85rem; font-weight: 600;">Transform (Pydantic Validation)</div>
-                            <div style="font-size: 0.75rem; color: var(--accent-blue);">Processing stream...</div>
-                        </div>
-                        <span class="pulse-dot" style="background-color: var(--accent-blue); box-shadow: 0 0 10px var(--accent-blue);"></span>
-                    </div>
-                    <div class="dag-node" id="node-load">
-                        <div>
-                            <div style="font-size: 0.85rem; font-weight: 600;">Load (Data Lake / Redis)</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">Waiting for dependencies</div>
-                        </div>
-                        <span style="color: var(--text-muted); font-size: 0.8rem;">PENDING</span>
-                    </div>
-                </div>
+                <div class="panel-title">Cross-Asset Pearson Correlation</div>
+                <div style="font-size: 2.5rem; font-weight: 800; text-align: center; margin: 20px 0; color: var(--accent-green);" id="corr-value">---</div>
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">BTC vs ETH (Rolling Window)</div>
             </div>
 
             <div class="panel" style="flex: 1;">
-                <div class="panel-title">Live Ingestion Logs (Data Contracts)</div>
+                <div class="panel-title">AI Sentinel Logs</div>
                 <div class="terminal" id="terminal">
                     <!-- Logs will be injected here -->
                 </div>
@@ -270,24 +271,59 @@
     </div>
 
     <script>
-        // --- 1. LIVE METRICS POLLING ---
-        async function fetchLiveMetrics() {
+        // --- 1. AI SIGNALS POLLING ---
+        async function fetchQuantSignals() {
             try {
-                const response = await fetch('/live/dashboard');
-                const data = await response.json();
-                const metrics = data.metrics;
+                // Fetch context price
+                const liveRes = await fetch('/live/dashboard');
+                const liveData = await liveRes.json();
+                document.getElementById('btc-price').innerText = '$' + liveData.metrics.markets.price_usd.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+                // Fetch AI Signals
+                const res = await fetch('/analytics/signals');
+                const data = await res.json();
                 
-                document.getElementById('btc-price').innerText = '$' + metrics.markets.price_usd.toLocaleString(undefined, {minimumFractionDigits: 2});
-                document.getElementById('weather-temp').innerText = metrics.environment.temperature_celsius + '°C';
-                document.getElementById('weather-meta').innerText = `${metrics.environment.city} | Wind: ${metrics.environment.windspeed}km/h`;
-                document.getElementById('github-status').innerText = metrics.dev_ops.status;
+                // Whale Z-Score
+                document.getElementById('whale-zscore').innerText = 'Z: ' + data.whale_detection.z_score;
+                if(data.whale_detection.is_whale_anomaly) {
+                    document.getElementById('whale-zscore').style.color = 'var(--danger)';
+                    document.getElementById('whale-status').innerHTML = '<span style="color:var(--danger)">WHALE DETECTED</span> (Vol > 3 StdDev)';
+                    addLog(`[ALERT] WHALE DETECTED! Z-Score: ${data.whale_detection.z_score}`, 'danger');
+                } else {
+                    document.getElementById('whale-zscore').style.color = 'var(--text-main)';
+                    document.getElementById('whale-status').innerHTML = 'Normal Volume distribution';
+                }
+
+                // OBI
+                const obi = data.order_book_imbalance.obi;
+                document.getElementById('obi-value').innerText = 'OBI: ' + obi;
+                document.getElementById('obi-status').innerText = data.order_book_imbalance.status;
+                // Convert -1 to 1 into 0 to 100%
+                const percentage = ((obi + 1) / 2) * 100;
+                document.getElementById('obi-bar').style.width = percentage + '%';
+
+                if(data.order_book_imbalance.spoofing_detected) {
+                    addLog(`[WARN] Spoofing detected! Imbalance skewed heavily. OBI: ${obi}`, 'warn');
+                }
+
+                // Correlation
+                const corr = data.btc_eth_correlation;
+                const corrEl = document.getElementById('corr-value');
+                corrEl.innerText = corr;
+                if (corr < 0.5) {
+                    corrEl.style.color = 'var(--accent-orange)';
+                    addLog(`[INFO] Decoupling Event: BTC/ETH Correlation dropped to ${corr}`, 'warn');
+                } else {
+                    corrEl.style.color = 'var(--accent-green)';
+                }
                 
             } catch (error) {
                 console.error("API Error");
             }
         }
-        fetchLiveMetrics();
-        setInterval(fetchLiveMetrics, 3000);
+        
+        fetchQuantSignals();
+        setInterval(fetchQuantSignals, 2500);
 
         // --- 2. CHART.JS REAL-TIME SETUP ---
         const ctx = document.getElementById('throughputChart').getContext('2d');
@@ -296,10 +332,10 @@
             data: {
                 labels: Array(20).fill(''),
                 datasets: [{
-                    label: 'Events Validated (Ops/sec)',
+                    label: 'Multiplexed Ingestion (Ops/sec)',
                     data: Array(20).fill(0),
-                    borderColor: '#06b6d4',
-                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     borderWidth: 2,
                     fill: true,
                     tension: 0.4,
@@ -311,7 +347,7 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: true, max: 1500, grid: { color: '#374151' }, ticks: { color: '#9ca3af' } },
+                    y: { beginAtZero: true, max: 2000, grid: { color: '#374151' }, ticks: { color: '#9ca3af' } },
                     x: { grid: { display: false } }
                 },
                 animation: { duration: 0 }
@@ -326,7 +362,7 @@
             const time = new Date().toISOString().substring(11, 23);
             const line = document.createElement('div');
             line.className = 'log-line';
-            let colorClass = type === 'info' ? 'log-info' : (type === 'success' ? 'log-success' : 'log-warn');
+            let colorClass = type === 'info' ? 'log-info' : (type === 'success' ? 'log-success' : (type === 'danger' ? 'log-danger' : 'log-warn'));
             line.innerHTML = `<span class="log-time">[${time}]</span> <span class="${colorClass}">${msg}</span>`;
             terminal.appendChild(line);
             if(terminal.childNodes.length > 50) terminal.removeChild(terminal.firstChild);
@@ -334,8 +370,8 @@
         }
 
         setInterval(() => {
-            // Simulate random throughput (e.g. 500 to 1200 ops/sec from binance)
-            const ops = Math.floor(Math.random() * 700) + 500;
+            // Simulate random throughput (e.g. 800 to 1800 ops/sec due to multiplexing)
+            const ops = Math.floor(Math.random() * 1000) + 800;
             totalEvents += ops;
             document.getElementById('event-count').innerText = totalEvents.toLocaleString();
 
@@ -345,17 +381,14 @@
             dataArr.push(ops);
             chart.update();
 
-            // Add Log
+            // Add Generic Log
             if(Math.random() > 0.8) {
-                addLog(`[WARN] Schema Drift detected. Field 'q' missing. Dropped event.`);
-            } else {
-                addLog(`[OK] Validated ${ops} events via BinanceTradeContract. Injected Lineage.`);
-                if(Math.random() > 0.5) addLog(`[STREAM] Pushed batch to Redis Key: ferrox:ingestion:crypto_trades`, 'success');
+                addLog(`[OK] DAG Node 'Extract': Ingested ${ops} Multiplexed Contracts (Trade+Depth)`);
             }
         }, 1000);
         
-        addLog("Initializing Ferrox-Py Ingestion Engine...", "info");
-        addLog("Connected to Binance WebSocket wss://stream.binance.com:9443/ws/btcusdt@trade", "success");
+        addLog("Initializing Ferrox-Py Quantitative Analytics Engine...", "info");
+        addLog("Connected to Binance Multiplexed Streams (BTC, ETH, SOL)", "success");
     </script>
 </body>
 </html>
