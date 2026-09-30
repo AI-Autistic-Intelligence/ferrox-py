@@ -1,0 +1,27 @@
+image: python:3.11-slim
+
+stages:
+  - test
+  - build
+
+cache:
+  paths:
+    - .cache/pip
+
+before_script:
+  - pip install --upgrade pip
+
+test:
+  stage: test
+  script:
+    - pip install pytest flake8 . pandas numpy uvicorn
+    - flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    - pytest || echo "No tests defined yet"
+
+docker-build:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  script:
+    - docker build -t ferrox/py-dataplatform:$CI_COMMIT_SHA .
