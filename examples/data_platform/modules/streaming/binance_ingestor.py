@@ -1,7 +1,7 @@
 import asyncio
 import json
 import websockets
-import redis.asyncio as redis
+from .database import init_db, AsyncSessionLocal, CryptoTrade, CryptoDepth
 from pydantic import ValidationError
 from structlog import get_logger
 from .data_contracts import BinanceTradeContract, BinanceDepthContract, DataLineage
@@ -17,20 +17,10 @@ STREAMS = [
 ]
 BINANCE_WS_URL = f"wss://stream.binance.com:9443/stream?streams={'/'.join(STREAMS)}"
 
-REDIS_STREAM_TRADES = "ferrox:ingestion:crypto_trades"
-REDIS_STREAM_DEPTH = "ferrox:ingestion:crypto_depth"
-
 async def run_ingestion_engine():
-    logger.info("Starting Multi-Asset High-Throughput Ingestion Engine...")
-    
-    r = redis.Redis(host='localhost', port=6379, decode_responses=True, socket_connect_timeout=1.0)
-    use_redis = True
-    try:
-        await asyncio.wait_for(r.ping(), timeout=2.0)
-        logger.info("Connected to Redis for Stream Backpressure.")
-    except Exception:
-        logger.warning("Redis not found or timed out. Running in Simulation/Print mode.")
-        use_redis = False
+    logger.info("Initializing Postgres/SQLAlchemy Database...")
+    await init_db()
+    use_db = True
 
     async for websocket in websockets.connect(BINANCE_WS_URL):
         logger.info("Connected to Binance Multiplexed WebSocket", streams=len(STREAMS))
@@ -51,8 +41,20 @@ async def run_ingestion_engine():
                         contract = BinanceTradeContract(**raw_data)
                         contract.lineage = lineage
                         
-                        if use_redis:
-                            await r.xadd(REDIS_STREAM_TRADES, {"payload": contract.model_dump_json()}, maxlen=100000)
+                        if use_db:
+                            async with AsyncSessionLocal() as session:
+                                trade_record = CryptoTrade(
+                                    event_time=contract.event_time,
+                                    symbol=contract.symbol,
+                                    trade_id=contract.trade_id,
+                                    price=contract.price,
+                                    quantity=contract.quantity,
+                                    is_buyer_maker=contract.is_buyer_maker,
+                                    source_system=lineage.source_system,
+                                    processor_version=lineage.processor_version
+                                )
+                                session.add(trade_record)
+                                await session.commit()
                         else:
                             logger.info("trade_ingested", symbol=contract.symbol, price=contract.price)
                             
@@ -63,8 +65,18 @@ async def run_ingestion_engine():
                         contract = BinanceDepthContract(**raw_data)
                         contract.lineage = lineage
                         
-                        if use_redis:
-                            await r.xadd(REDIS_STREAM_DEPTH, {"payload": contract.model_dump_json()}, maxlen=50000)
+                        if use_db:
+                            async with AsyncSessionLocal() as session:
+                                depth_record = CryptoDepth(
+                                    symbol=contract.symbol,
+                                    last_update_id=contract.last_update_id,
+                                    bids=contract.bids,
+                                    asks=contract.asks,
+                                    source_system=lineage.source_system,
+                                    processor_version=lineage.processor_version
+                                )
+                                session.add(depth_record)
+                                await session.commit()
                         else:
                             # Log just top bid/ask to avoid console spam
                             top_bid = contract.bids[0][0] if contract.bids else 0

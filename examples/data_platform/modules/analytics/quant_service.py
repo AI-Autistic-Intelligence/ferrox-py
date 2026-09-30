@@ -9,7 +9,7 @@ logger = get_logger()
 class QuantitativeAnalyticsService:
     """
     Computes statistical anomalies and order book imbalances.
-    In a real scenario, this extracts the last N minutes of data from Redis.
+    In a real scenario, this extracts the last N minutes of data from Postgres.
     For this demo, we simulate the historical distribution based on current data.
     """
     
