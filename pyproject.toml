@@ -22,7 +22,8 @@ dependencies = [
     "strawberry-graphql>=0.209.0",
     "pydantic-settings>=2.0.0",
     "redis>=5.0.0",
-    "prometheus-client>=0.17.0"
+    "prometheus-client>=0.17.0",
+    "websockets>=11.0.3"
 ]
 
 [project.scripts]
