@@ -4,28 +4,26 @@ import websockets
 import redis.asyncio as redis
 from pydantic import ValidationError
 from structlog import get_logger
-from .data_contracts import BinanceTradeContract, DataLineage
+from .data_contracts import BinanceTradeContract, BinanceDepthContract, DataLineage
 
 logger = get_logger()
 
-# Binance Public WebSocket (High Volume Stream)
-BINANCE_WS_URL = "wss://stream.binance.com:9443/ws/btcusdt@trade"
+# Multiplexed Binance WebSocket for multi-asset Trades & OrderBooks
+# We ingest Trades for BTC, ETH, SOL (for Correlation & Whales)
+# We ingest Depth5 for BTC, ETH, SOL (for OrderBook Imbalance/Spoofing)
+STREAMS = [
+    "btcusdt@trade", "ethusdt@trade", "solusdt@trade",
+    "btcusdt@depth5@100ms", "ethusdt@depth5@100ms", "solusdt@depth5@100ms"
+]
+BINANCE_WS_URL = f"wss://stream.binance.com:9443/stream?streams={'/'.join(STREAMS)}"
 
-# Redis Stream Key for Backpressure
-REDIS_STREAM_KEY = "ferrox:ingestion:crypto_trades"
+REDIS_STREAM_TRADES = "ferrox:ingestion:crypto_trades"
+REDIS_STREAM_DEPTH = "ferrox:ingestion:crypto_depth"
 
 async def run_ingestion_engine():
-    """
-    Solves Point 2 (Backpressure):
-    Connects to high-volume WebSocket, validates via Contract, and appends to a Redis Stream.
-    If the consumer is slow, Redis buffers the stream, preventing memory crashes.
-    """
-    logger.info("Starting High-Throughput Ingestion Engine...")
+    logger.info("Starting Multi-Asset High-Throughput Ingestion Engine...")
     
-    # Connect to Redis with a short timeout
     r = redis.Redis(host='localhost', port=6379, decode_responses=True, socket_connect_timeout=1.0)
-    
-    # Try connecting to Redis, if fails, just simulate it for demo
     use_redis = True
     try:
         await asyncio.wait_for(r.ping(), timeout=2.0)
@@ -35,31 +33,47 @@ async def run_ingestion_engine():
         use_redis = False
 
     async for websocket in websockets.connect(BINANCE_WS_URL):
-        logger.info("Connected to Binance WebSocket", url=BINANCE_WS_URL)
+        logger.info("Connected to Binance Multiplexed WebSocket", streams=len(STREAMS))
         try:
             async for message in websocket:
-                raw_data = json.loads(message)
+                payload = json.loads(message)
+                stream_name = payload.get("stream")
+                raw_data = payload.get("data")
                 
-                # 1. Enforce Data Contract (Schema Validation)
+                if not stream_name or not raw_data:
+                    continue
+                    
+                lineage = DataLineage(source_system="Binance_WS_API")
+                
+                # Route based on stream type
                 try:
-                    contract = BinanceTradeContract(**raw_data)
+                    if "@trade" in stream_name:
+                        contract = BinanceTradeContract(**raw_data)
+                        contract.lineage = lineage
+                        
+                        if use_redis:
+                            await r.xadd(REDIS_STREAM_TRADES, {"payload": contract.model_dump_json()}, maxlen=100000)
+                        else:
+                            logger.info("trade_ingested", symbol=contract.symbol, price=contract.price)
+                            
+                    elif "@depth5" in stream_name:
+                        # Depth payload doesn't contain symbol, we extract it from stream name (e.g. btcusdt@depth5)
+                        symbol = stream_name.split('@')[0].upper()
+                        raw_data['symbol'] = symbol
+                        contract = BinanceDepthContract(**raw_data)
+                        contract.lineage = lineage
+                        
+                        if use_redis:
+                            await r.xadd(REDIS_STREAM_DEPTH, {"payload": contract.model_dump_json()}, maxlen=50000)
+                        else:
+                            # Log just top bid/ask to avoid console spam
+                            top_bid = contract.bids[0][0] if contract.bids else 0
+                            top_ask = contract.asks[0][0] if contract.asks else 0
+                            logger.info("depth_ingested", symbol=contract.symbol, top_bid=top_bid, top_ask=top_ask)
+                            
                 except ValidationError as e:
-                    logger.error("schema_drift_detected", error=str(e), raw_data=raw_data)
-                    continue # Skip invalid data (or send to a Dead Letter Queue)
-                
-                # 3. Inject Data Lineage
-                contract.lineage = DataLineage(source_system="Binance_WS_API")
-                
-                # Serialize back to JSON for storage
-                safe_payload = contract.model_dump_json()
-                
-                # 2. Handle Backpressure via Redis Streams
-                if use_redis:
-                    # Append to stream with a max length to prevent unbounded growth (e.g. 100k events)
-                    await r.xadd(REDIS_STREAM_KEY, {"payload": safe_payload}, maxlen=100000)
-                    logger.debug("ingested_to_stream", symbol=contract.symbol, price=contract.price)
-                else:
-                    logger.info("ingested_event", symbol=contract.symbol, price=contract.price, lineage=contract.lineage.model_dump())
+                    logger.error("schema_drift_detected", stream=stream_name, error=str(e))
+                    continue
                     
         except websockets.ConnectionClosed:
             logger.warning("WebSocket Connection Closed. Reconnecting...")
