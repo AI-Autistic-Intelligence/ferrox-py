@@ -10,6 +10,9 @@ class LiveDataAggregatorService:
     Fetches data concurrently from multiple public, free APIs.
     """
     
+    def __init__(self):
+        pass
+
     async def fetch_crypto_price(self, client: httpx.AsyncClient) -> dict:
         try:
             # Binance public API (no key required for ticker)

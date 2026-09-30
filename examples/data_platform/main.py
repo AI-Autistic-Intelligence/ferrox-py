@@ -1,13 +1,25 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from ferrox_py.core.container import Container
 from modules.ingestion.ingestion_controller import IngestionController
 from modules.catalog.catalog_controller import CatalogController
 from modules.live_data.live_controller import LiveController
 from modules.etl.etl_controller import EtlController
+import os
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Ferrox Data Platform")
+    
+    # Mount Static Files for the Dashboard
+    static_dir = os.path.join(os.path.dirname(__file__), "static")
+    if os.path.exists(static_dir):
+        app.mount("/static", StaticFiles(directory=static_dir), name="static")
+    
+    @app.get("/")
+    async def serve_dashboard():
+        return FileResponse(os.path.join(static_dir, "index.html"))
     
     # 1. Boot IoC Container
     container = Container()

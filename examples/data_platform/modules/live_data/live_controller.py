@@ -7,8 +7,8 @@ class LiveController:
         self.container = container
         
         # Register the service in the IoC Container dynamically for the demo
-        if not self.container.has(LiveDataAggregatorService):
-            self.container.register(LiveDataAggregatorService, lambda c: LiveDataAggregatorService())
+        if LiveDataAggregatorService not in self.container._providers:
+            self.container._providers[LiveDataAggregatorService] = LiveDataAggregatorService
         
         self.setup_routes()
 
