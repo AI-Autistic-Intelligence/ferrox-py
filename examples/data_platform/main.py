@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from ferrox_py.core.container import Container
 from modules.ingestion.ingestion_controller import IngestionController
 from modules.catalog.catalog_controller import CatalogController
+from modules.live_data.live_controller import LiveController
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Ferrox Data Platform")
@@ -13,10 +14,12 @@ def create_app() -> FastAPI:
     # 2. Register Controllers
     ingest = IngestionController(container)
     catalog = CatalogController(container)
+    live = LiveController(container)
     
     # 3. Mount Routes
     app.include_router(ingest.router)
     app.include_router(catalog.router)
+    app.include_router(live.router)
     
     return app
 
