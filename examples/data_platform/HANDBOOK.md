@@ -1,59 +1,138 @@
-# Quantitative Data Platform - Deep Kernel-to-Userland Handbook
+# Ferrox-Py Quantitative Data Platform - The Definitive Handbook
 
-## 1. Executive Summary
+## 1. Executive Summary & Senior Engineering Vision
 
-This handbook details the **Quantitative Data Platform**, the official Ferrox-Py reference architecture. 
+This document serves as the absolute source of truth for the **Quantitative Data Platform**, the official Ferrox-Py reference architecture. 
 
-As engineers, we do not view applications as abstract code running in a void; we view them as orchestrations of CPU cycles, memory pages, and kernel interrupts. This application was architected from the OS-level up to solve the specific bottlenecks of **High-Frequency Trading (HFT) and Quantitative Market Data Ingestion**. In this domain, a poorly managed `epoll` loop or an unoptimized socket buffer directly translates to latency arbitrage against us.
+As a Senior Engineer, I designed this platform to process High-Frequency Trading (HFT) and Quantitative Market Data. In this domain, a missed tick or a garbage collection pause translates directly to financial loss. This system represents the pinnacle of Python async engineering, proving that when Python is intimately coupled with the Linux kernel's event loop (`epoll`), it can rival compiled languages in I/O throughput.
 
-This application implements a **zero-trust security model**, **ACID-compliant relational persistence**, and **highly concurrent asynchronous I/O**, designed with deep mechanical sympathy for the underlying Linux kernel.
-
----
-
-## 2. Low-Level Architectural Blueprint
-
-### 2.1 The Kernel I/O Model & Event Loop
-At its core, this platform ingests raw WebSocket streams (TCP over TLS). Python's inherent limitation is the Global Interpreter Lock (GIL). To bypass this, we rely heavily on the OS kernel's I/O multiplexing (`epoll` on Linux). 
-- **Socket Tuning**: The ingestor daemon configures raw TCP sockets with `TCP_NODELAY` to disable Nagle's algorithm, ensuring tick data is flushed to the network interface immediately rather than buffered. We also utilize `SO_REUSEPORT` to allow multiple worker processes to bind to the same port, letting the Linux kernel distribute incoming connections evenly across CPU cores at the socket level.
-- **uvloop Integration**: The `asyncio` event loop is replaced with `uvloop` (a Cython wrapper around `libuv`). This pushes the event-loop orchestration down to C, minimizing context switches between Python userland and the kernel.
-
-### 2.2 Persistence: asyncpg and the PostgreSQL Binary Protocol
-We migrated from Redis (in-memory) to PostgreSQL for strict ACID compliance. However, standard ORMs use `libpq`, a blocking C library. 
-- **Binary Protocol**: We use `asyncpg`, which bypasses `libpq` entirely. It implements the PostgreSQL frontend/backend protocol natively. Data from the network socket is parsed directly from binary representations (e.g., IEEE 754 floats for crypto prices) into Python C-extension objects, avoiding expensive UTF-8 string decoding overheads.
-- **Write-Ahead Logging (WAL)**: At the database level, `CryptoTrade` models generate rapid inserts. We tuned Postgres `commit_delay` and `wal_writer_delay` to batch kernel `fsync()` calls. The OS page cache buffers these writes before flushing them to NVMe storage, achieving massive throughput without sacrificing disk durability.
-
-### 2.3 Threat Engine & Information Theory Security
-Traditional Regex-based WAFs are vulnerable to ReDoS (Regular Expression Denial of Service), where an attacker crafts a payload that forces the CPU into catastrophic backtracking (`O(2^n)` complexity).
-- **Shannon Entropy Analysis**: Our `SentinelThreatEngineMiddleware` analyzes the incoming byte streams using Information Theory. We calculate the entropy of the payload string: `H(X) = -Σ P(x) * log2 P(x)`. If the entropy exceeds a specific threshold (e.g., `> 4.8` bits per byte), the payload is likely an obfuscated SQLi, Base64-encoded shellcode, or a Prompt Injection attack designed to bypass AST parsers. The CPU cost is strictly `O(N)` linear time.
-- **Timing Attacks**: Token verification and cryptographic signatures use constant-time comparison functions (e.g., `hmac.compare_digest`) at the C level, ensuring that an attacker measuring CPU cycles via network latency cannot infer byte-by-byte token correctness.
+This handbook details the complete lifecycle of the platform: from the hardware interrupts to the userland Python AST, down to the persistence layers.
 
 ---
 
-## 3. Programmer & DevOps Handbook
+## 2. The Domain Problem
 
-### 3.1 Advanced Environment Setup
+Financial exchanges (like Binance, Kraken, and CME) blast millions of JSON or binary payloads via WebSockets. We must:
+1. Maintain unyielding, non-blocking TCP connections.
+2. Parse variable-length streams instantaneously.
+3. Validate and sanitize payloads against malformed data and malicious injections (zero-trust).
+4. Persist data with strict ACID guarantees (preventing ledger corruption).
+5. Expose historical and real-time aggregations via GraphQL and REST without blocking the ingestor.
+
+---
+
+## 3. Low-Level Architecture & OS-Kernel Interactions
+
+We do not view Python as a void; we view it as an orchestrator of OS syscalls.
+
+### 3.1 The Epoll Bridge & Socket Tuning
+Python's Global Interpreter Lock (GIL) is bypassed by moving the I/O multiplexing into C. We use `uvloop` (a Cython wrapper for `libuv`) which interfaces directly with Linux `epoll` or macOS `kqueue`.
+- **TCP_NODELAY**: Sockets are configured to disable Nagle's algorithm. In trading, waiting to buffer 1500 bytes before sending a packet causes unacceptable latency. Packets are flushed to the NIC immediately.
+- **SO_REUSEPORT**: We allow multiple Python worker processes to bind to the same inbound API port (8000). The Linux kernel distributes incoming TCP SYNs across the processes, maximizing multi-core CPU utilization.
+
+### 3.2 Thread Starvation & Context Switching
+Because the GIL exists, CPU-bound tasks (like heavy JSON deserialization or cryptographic signing) will starve the event loop, causing dropped WebSocket frames. We strictly offload these tasks to Rust-based libraries (`orjson`) or C-extensions, allowing the Python thread to hit `epoll_wait` as frequently as possible.
+
+---
+
+## 4. Application Layer & Framework Internals
+
+### 4.1 FastAPI / Starlette Foundation
+The platform uses the ASGI standard. The outer routing boundary is handled by FastAPI for automatic OpenAPI generation and Pydantic schema validation.
+- **Background Daemons**: The WebSocket ingestors run as background Tasks, initialized via Starlette's `@asynccontextmanager` lifecycle. They are isolated from the HTTP request/response cycle.
+
+### 4.2 GraphQL Integration
+We utilize **Strawberry GraphQL** for data presentation. Quants do not want to pull 10GB of REST data to analyze a 1-minute window. GraphQL allows strict, graph-based querying of order books and trade ledgers.
+
+---
+
+## 5. Security Model: Zero-Trust & Cryptography
+
+### 5.1 Sentinel Threat Engine (WAF)
+Regex-based Web Application Firewalls are fundamentally flawed. A crafted payload can trigger Catastrophic Backtracking (`O(2^n)` complexity), bringing down the server via ReDoS.
+- **Shannon Entropy Analysis**: Our `SentinelThreatEngineMiddleware` calculates the informational entropy of the incoming byte stream: `H(X) = -Σ P(x) * log2 P(x)`. High entropy (e.g., > 4.8 bits/byte) immediately flags the payload as potentially obfuscated shellcode, SQLi, or Prompt Injection. This mathematical analysis runs in linear `O(N)` time.
+
+### 5.2 PASETO v4 over JWT
+JWT allows "Algorithm Confusion" (e.g., switching RSA to HMAC) because the token dictates the algorithm. 
+- **PASETO v4 Local**: We enforce `XChaCha20-Poly1305` authenticated encryption. The algorithm is structurally bound to the protocol version. Verification relies on constant-time C functions to prevent side-channel timing attacks.
+
+---
+
+## 6. Persistence & ACID Strategy
+
+### 6.1 PostgreSQL & asyncpg
+We explicitly abandoned Redis streams for this ledger to guarantee ACID durability.
+- **Binary Protocol Mapping**: We use `asyncpg`. It speaks the PostgreSQL frontend/backend protocol natively over TCP, bypassing the blocking `libpq` C-library. It maps binary IEEE 754 floats from the DB directly to Python types, bypassing UTF-8 string parsing overhead.
+
+### 6.2 Write-Ahead Logging (WAL) Tuning
+During extreme volatility, inserting rows one by one kills performance due to disk fsync limits. We rely on SQLAlchemy's `AsyncSessionLocal` to batch inserts. The OS kernel's page cache holds the dirty pages, while Postgres `wal_writer_delay` groups WAL flushes, achieving sequential disk write speeds.
+
+---
+
+## 7. Programmer's Guide (Developer Workflow)
+
+### 7.1 Environment Setup
 ```bash
-# Compile dependencies targeting specific CPU architectures (AVX-512 support)
+# 1. Create a pristine virtual environment
+python3.11 -m venv venv
+source venv/bin/activate
+
+# 2. Install dependencies (Requires ferrox-py>=1.0.1)
+# Use CFLAGS to optimize C-extensions for your CPU architecture
 CFLAGS="-O3 -march=native" pip install -r requirements.txt
 
-# Tune the Linux Kernel Network Stack (sysctl) for HFT
+# 3. Environment Configuration (.env)
+DATABASE_URL="postgresql+asyncpg://ferrox:password@localhost:5432/quant_db"
+PASETO_SECRET_KEY="v4.local.YOUR_32_BYTE_SECRET_KEY_HERE"
+```
+
+### 7.2 Creating a New Ingestor (e.g., Coinbase)
+1. Navigate to `modules/streaming/`.
+2. Create `coinbase_ingestor.py`.
+3. Implement `async def stream_coinbase()` using the `websockets` library.
+4. Implement exponential backoff in a `while True:` loop to handle exchange disconnects.
+5. In `main.py`, add `asyncio.create_task(stream_coinbase())` to the `lifespan` context manager.
+
+### 7.3 Database Migrations (Alembic)
+Whenever `CryptoTrade` or `CryptoDepth` models are altered in `database.py`:
+```bash
+alembic revision --autogenerate -m "Added trade volume column"
+alembic upgrade head
+```
+
+---
+
+## 8. User & DevOps Handbook (Operations)
+
+### 8.1 OS & Sysctl Tuning for HFT
+Before deploying, the Linux kernel must be tuned:
+```bash
+# Prevent ephemeral port exhaustion
 sysctl -w net.ipv4.tcp_tw_reuse=1
+# Increase max connection backlog
 sysctl -w net.core.somaxconn=65535
+# Tune TCP read/write memory buffers
 sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
 sysctl -w net.ipv4.tcp_wmem="4096 65536 16777216"
 ```
 
-### 3.2 Database Connection Pooling Strategy
-The `AsyncSessionLocal` pool size must be mathematically derived from the formula:
-`connections = ((core_count * 2) + effective_spindle_count)`.
-Do not arbitrarily increase connection pools. A pool of 1000 connections forces the PostgreSQL kernel processes into heavy context-switching, thrashing the CPU's L1/L2 caches. Keep the pool small and the query execution fast.
-
-### 3.3 Security: PASETO vs JWT at the Cryptographic Level
-We enforce **PASETO v4 (Platform-Agnostic Security Tokens)**. 
-- **The JWT Flaw**: JWT standardizes the header, placing the cryptographic algorithm (`alg`) under the attacker's control. This leads to `alg: none` or RSA-to-HMAC confusion attacks.
-- **The PASETO Paradigm**: PASETO v4 local tokens use `XChaCha20-Poly1305` authenticated encryption. The algorithm is structurally bound to the protocol version. The CPU executes a deterministic encryption path, mathematically proving both authenticity and confidentiality without negotiating parameters with the client.
+### 8.2 Deployment: Docker & Uvicorn
+Serverless (AWS Lambda) is unacceptable due to long-lived WebSockets. Deploy on Kubernetes or Docker Swarm.
+```bash
+# Run with Uvicorn utilizing uvloop
+uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4 --loop uvloop --http httptools
+```
+*Warning: Running 4 workers spawns 4 background ingestors. Ensure your ingestors have a leader-election mechanism (e.g., Redis Lock) or extract the ingestors to a separate singleton microservice.*
 
 ---
 
-## 4. Senior Engineering Philosophy
-This implementation proves that Python can operate in high-throughput financial environments when we stop fighting the interpreter and start leveraging the OS. By understanding how `epoll` handles file descriptors, how Postgres buffers dirty pages in memory, and how CPUs execute instructions in linear vs exponential time, we built a system that is fundamentally secure and horizontally scalable by default.
+## 9. Observability & Telemetry
+
+### 9.1 Prometheus Metrics
+The platform exposes `/metrics` for Prometheus scraping.
+- `ferrox_threats_blocked_total`: Counter for WAF interventions.
+- `ferrox_ingestion_latency_ms`: Histogram of time from WebSocket read to Postgres commit.
+- `sqlalchemy_connection_pool_active`: Gauge for DB saturation.
+
+### 9.2 Log Redaction
+Use `structlog` to output JSON lines for ELK/Datadog. Ensure `PASETO` tokens and passwords are redacted via custom processors before hitting `stdout`.
