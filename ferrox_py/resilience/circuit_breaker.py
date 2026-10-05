@@ -1,12 +1,12 @@
 import time
 import asyncio
-from typing import Callable, Any
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Callable, Any
 
 class CircuitBreakerOpenException(Exception):
     pass
 
 class CircuitBreaker:
-    def __init__(self, max_failures: int = 5, reset_timeout: int = 60):
+    def __init__(self, max_failures: int = 5, reset_timeout: int = 60) -> None:
         self.max_failures = max_failures
         self.reset_timeout = reset_timeout
         self.failures = 0

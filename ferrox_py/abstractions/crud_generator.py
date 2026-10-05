@@ -1,30 +1,30 @@
-from typing import Type
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Type
 from fastapi import APIRouter
 
-def generate_crud_controller(entity: Type, service: Type, prefix: str):
+def generate_crud_controller(entity: Type[Any], service: Type[Any], prefix: str) -> Any:
     """
     Generates a standard FastAPI router with CRUD operations for an entity.
     """
     router = APIRouter(prefix=prefix, tags=[entity.__name__])
 
     @router.get("/")
-    async def get_all():
+    async def get_all() -> Any:
         return {"action": "get_all", "entity": entity.__name__}
         
     @router.get("/{id}")
-    async def get_one(id: str):
+    async def get_one(id: str) -> Any:
         return {"action": "get_one", "id": id, "entity": entity.__name__}
 
     @router.post("/")
-    async def create(data: dict):
+    async def create(data: Dict[Any, Any]) -> Any:
         return {"action": "create", "data": data, "entity": entity.__name__}
         
     @router.put("/{id}")
-    async def update(id: str, data: dict):
+    async def update(id: str, data: Dict[Any, Any]) -> Any:
         return {"action": "update", "id": id, "data": data, "entity": entity.__name__}
         
     @router.delete("/{id}")
-    async def delete(id: str):
+    async def delete(id: str) -> Any:
         return {"action": "delete", "id": id, "entity": entity.__name__}
 
     return router

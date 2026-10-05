@@ -1,0 +1,192 @@
+ferrox_py\web\decorators.py:3: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\web\decorators.py:4: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\web\decorators.py:9: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\web\decorators.py:10: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\web\decorators.py:10: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\web\decorators.py:11: error: "Callable[..., Any]" has no attribute "__ferrox_method__"  [attr-defined]
+ferrox_py\web\decorators.py:12: error: "Callable[..., Any]" has no attribute "__ferrox_path__"  [attr-defined]
+ferrox_py\web\decorators.py:16: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\web\decorators.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\web\decorators.py:17: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\web\decorators.py:18: error: "Callable[..., Any]" has no attribute "__ferrox_method__"  [attr-defined]
+ferrox_py\web\decorators.py:19: error: "Callable[..., Any]" has no attribute "__ferrox_path__"  [attr-defined]
+ferrox_py\web\decorators.py:23: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\web\decorators.py:24: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\web\decorators.py:24: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\web\decorators.py:26: error: "Callable[..., Any]" has no attribute "__ferrox_guards__"  [attr-defined]
+ferrox_py\web\decorators.py:27: error: "Callable[..., Any]" has no attribute "__ferrox_guards__"  [attr-defined]
+ferrox_py\cqrs\bus.py:7: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\cqrs\bus.py:7: note: Use "-> None" if function does not return a value
+ferrox_py\cqrs\bus.py:8: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\cqrs\bus.py:10: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\cqrs\bus.py:10: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\core\module.py:3: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\core\module.py:4: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\core\module.py:4: error: Incompatible default for parameter "controllers" (default has type "None", parameter has type "list[type[Any]]")  [assignment]
+ferrox_py\core\module.py:4: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+ferrox_py\core\module.py:4: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+ferrox_py\core\module.py:5: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\core\module.py:5: error: Incompatible default for parameter "providers" (default has type "None", parameter has type "list[type[Any]]")  [assignment]
+ferrox_py\core\module.py:5: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+ferrox_py\core\module.py:5: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+ferrox_py\core\module.py:6: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\core\module.py:6: error: Incompatible default for parameter "imports" (default has type "None", parameter has type "list[type[Any]]")  [assignment]
+ferrox_py\core\module.py:6: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+ferrox_py\core\module.py:6: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+ferrox_py\core\module.py:7: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\core\module.py:7: error: Incompatible default for parameter "exports" (default has type "None", parameter has type "list[type[Any]]")  [assignment]
+ferrox_py\core\module.py:7: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+ferrox_py\core\module.py:7: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+ferrox_py\core\module.py:10: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\core\module.py:10: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\cli\code_factory.py:1: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\abstractions\interceptors.py:6: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\abstractions\interceptors.py:14: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\core\provider.py:11: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\core\provider.py:16: error: "type[T]" has no attribute "__ferrox_injectable__"  [attr-defined]
+ferrox_py\core\provider.py:17: error: "type[T]" has no attribute "__ferrox_scope__"  [attr-defined]
+ferrox_py\transports\datagrid.py:5: error: Missing type arguments for generic type "Dict"  [type-arg]
+ferrox_py\transports\datagrid.py:13: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\security\selftest.py:5: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\observability\tracing.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\observability\health.py:6: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\observability\health.py:6: note: Use "-> None" if function does not return a value
+ferrox_py\integrations\search.py:5: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\integrations\search.py:8: error: Missing type arguments for generic type "list"  [type-arg]
+ferrox_py\integrations\i18n.py:5: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\integrations\i18n.py:5: note: Use "-> None" if function does not return a value
+ferrox_py\integrations\i18n.py:8: error: Incompatible default for parameter "locale" (default has type "None", parameter has type "str")  [assignment]
+ferrox_py\integrations\i18n.py:8: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+ferrox_py\integrations\i18n.py:8: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+ferrox_py\integrations\feature_flags.py:5: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\integrations\feature_flags.py:5: note: Use "-> None" if function does not return a value
+ferrox_py\databases\migrations.py:5: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\databases\migrations.py:5: note: Use "-> None" if function does not return a value
+ferrox_py\core\container.py:6: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\core\container.py:6: note: Use "-> None" if function does not return a value
+ferrox_py\core\container.py:7: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\core\container.py:8: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\core\container.py:10: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\core\container.py:15: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\core\container.py:15: error: Incompatible default for parameter "resolved" (default has type "None", parameter has type "set[type[Any]]")  [assignment]
+ferrox_py\core\container.py:15: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+ferrox_py\core\container.py:15: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+ferrox_py\core\container.py:28: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\architectures\events.py:6: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\events.py:6: note: Use "-> None" if function does not return a value
+ferrox_py\architectures\events.py:8: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\architectures\events.py:10: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\events.py:10: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\architectures\events.py:13: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\core\testing.py:10: error: Need type annotation for "_original_instances" (hint: "_original_instances: dict[<type>, <type>] = ...")  [var-annotated]
+ferrox_py\core\testing.py:12: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\core\testing.py:12: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\core\testing.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\core\testing.py:17: note: Use "-> None" if function does not return a value
+ferrox_py\observability\metrics.py:6: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\observability\metrics.py:6: note: Use "-> None" if function does not return a value
+ferrox_py\observability\metrics.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\security\rate_limiting.py:7: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\security\rate_limiting.py:7: note: Use "-> None" if function does not return a value
+ferrox_py\resilience\circuit_breaker.py:16: error: Function is missing a type annotation for one or more parameters  [no-untyped-def]
+ferrox_py\pipelines\node.py:16: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\pipelines\node.py:20: error: Function is missing a type annotation for one or more parameters  [no-untyped-def]
+ferrox_py\architectures\scheduling.py:4: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\scheduling.py:9: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\scheduling.py:9: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\architectures\scheduling.py:10: error: "Callable[..., Any]" has no attribute "__ferrox_cron__"  [attr-defined]
+ferrox_py\architectures\scheduling.py:14: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\scheduling.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\scheduling.py:18: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\architectures\scheduling.py:19: error: "Callable[..., Any]" has no attribute "__ferrox_interval__"  [attr-defined]
+ferrox_py\architectures\queues_jobs.py:8: error: Need type annotation for "_queue"  [var-annotated]
+ferrox_py\architectures\queues_jobs.py:9: error: Need type annotation for "_workers" (hint: "_workers: list[<type>] = ...")  [var-annotated]
+ferrox_py\architectures\queues_jobs.py:11: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\architectures\queues_jobs.py:14: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\queues_jobs.py:14: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\architectures\queues_jobs.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\queues_jobs.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\architectures\queues_jobs.py:20: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\queues_jobs.py:20: note: Use "-> None" if function does not return a value
+ferrox_py\architectures\queues_jobs.py:34: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\queues_jobs.py:34: note: Use "-> None" if function does not return a value
+ferrox_py\architectures\queues_jobs.py:38: error: Call to untyped function "_worker_loop" in typed context  [no-untyped-call]
+ferrox_py\architectures\queues_jobs.py:41: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\queues_jobs.py:41: note: Use "-> None" if function does not return a value
+ferrox_py\observability\logging.py:7: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\observability\logging.py:16: error: Incompatible default for parameter "cid" (default has type "None", parameter has type "str")  [assignment]
+ferrox_py\observability\logging.py:16: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+ferrox_py\observability\logging.py:16: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+ferrox_py\databases\sqlalchemy.py:7: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\databases\sqlalchemy.py:7: note: Use "-> None" if function does not return a value
+ferrox_py\databases\sqlalchemy.py:11: error: No overload variant of "sessionmaker" matches argument types "AsyncEngine", "type[AsyncSession]", "bool"  [call-overload]
+ferrox_py\databases\sqlalchemy.py:11: note: Possible overload variants:
+ferrox_py\databases\sqlalchemy.py:11: note:     def [_S: Session] sessionmaker(bind: Engine | Connection | None = ..., *, class_: type[_S], autoflush: bool = ..., expire_on_commit: bool = ..., info: dict[Any, Any] | None = ..., **kw: Any) -> sessionmaker[_S]
+ferrox_py\databases\sqlalchemy.py:11: note:     def [_S: Session] sessionmaker(bind: Engine | Connection | None = ..., *, autoflush: bool = ..., expire_on_commit: bool = ..., info: dict[Any, Any] | None = ..., **kw: Any) -> sessionmaker[Session]
+ferrox_py\databases\sqlalchemy.py:15: error: The return type of an async generator function should be "AsyncGenerator" or one of its supertypes  [misc]
+ferrox_py\pipelines\dag.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\pipelines\dag.py:30: error: Need type annotation for "completed" (hint: "completed: set[<type>] = ...")  [var-annotated]
+ferrox_py\pipelines\dag.py:33: error: Missing type arguments for generic type "Task"  [type-arg]
+ferrox_py\databases\redis.py:10: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\databases\redis.py:10: note: Use "-> None" if function does not return a value
+ferrox_py\databases\redis.py:11: error: Incompatible types in assignment (expression has type "Redis", variable has type "None")  [assignment]
+ferrox_py\databases\redis.py:16: error: Incompatible return value type (got "None", expected "str")  [return-value]
+ferrox_py\databases\redis.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\databases\redis.py:18: error: Incompatible default for parameter "ex" (default has type "None", parameter has type "int")  [assignment]
+ferrox_py\databases\redis.py:18: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+ferrox_py\databases\redis.py:18: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+ferrox_py\databases\redis.py:22: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\databases\redis.py:22: note: Use "-> None" if function does not return a value
+ferrox_py\security\paseto.py:10: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\security\paseto.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\security\paseto.py:17: error: Returning Any from function declared to return "dict[Any, Any]"  [no-any-return]
+ferrox_py\security\paseto.py:17: error: Item "dict[str, Any]" of "bytes | dict[str, Any]" has no attribute "decode"  [union-attr]
+ferrox_py\security\middlewares.py:32: error: Unused "type: ignore" comment  [unused-ignore]
+ferrox_py\security\headers.py:6: error: Function is missing a type annotation for one or more parameters  [no-untyped-def]
+ferrox_py\security\headers.py:20: error: Returning Any from function declared to return "Response"  [no-any-return]
+ferrox_py\transports\sse.py:12: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\transports\sse.py:17: error: Call to untyped function "format_sse" in typed context  [no-untyped-call]
+ferrox_py\cli\commands.py:5: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\cli\commands.py:5: note: Use "-> None" if function does not return a value
+ferrox_py\cli\commands.py:33: error: Call to untyped function "main" in typed context  [no-untyped-call]
+ferrox_py\core\errors.py:12: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\core\controllers.py:9: error: Missing type arguments for generic type "list"  [type-arg]
+ferrox_py\core\controllers.py:9: error: Incompatible default for parameter "tags" (default has type "None", parameter has type "list[Any]")  [assignment]
+ferrox_py\core\controllers.py:9: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+ferrox_py\core\controllers.py:9: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+ferrox_py\core\controllers.py:12: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\core\controllers.py:15: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\abstractions\crud_generator.py:4: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\abstractions\crud_generator.py:4: error: Missing type arguments for generic type "Type"  [type-arg]
+ferrox_py\abstractions\crud_generator.py:11: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\abstractions\crud_generator.py:15: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\abstractions\crud_generator.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\abstractions\crud_generator.py:19: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\abstractions\crud_generator.py:23: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\abstractions\crud_generator.py:23: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\abstractions\crud_generator.py:27: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\abstractions\guards_advanced.py:5: error: Missing type arguments for generic type "list"  [type-arg]
+ferrox_py\transports\file_storage.py:16: error: Argument 2 to "join" has incompatible type "str | None"; expected "str"  [arg-type]
+ferrox_py\security\jwt.py:14: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\security\jwt.py:18: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\security\jwt.py:31: error: Missing type arguments for generic type "dict"  [type-arg]
+ferrox_py\security\jwt.py:51: error: Returning Any from function declared to return "dict[Any, Any]"  [no-any-return]
+ferrox_py\security\distributed_locks.py:9: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\security\distributed_locks.py:9: note: Use "-> None" if function does not return a value
+ferrox_py\security\distributed_locks.py:15: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\sagas.py:7: error: Missing type arguments for generic type "Callable"  [type-arg]
+ferrox_py\architectures\sagas.py:7: error: Incompatible default for parameter "compensation" (default has type "None", parameter has type "Callable[..., Any]")  [assignment]
+ferrox_py\architectures\sagas.py:7: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+ferrox_py\architectures\sagas.py:7: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+ferrox_py\architectures\sagas.py:14: error: Missing type arguments for generic type "Dict"  [type-arg]
+ferrox_py\architectures\sagas.py:20: error: Need type annotation for "state" (hint: "state: dict[<type>, <type>] = ...")  [var-annotated]
+ferrox_py\architectures\sagas.py:30: error: Function "compensation" could always be true in boolean context  [truthy-function]
+ferrox_py\architectures\api_gateway.py:8: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\architectures\api_gateway.py:8: note: Use "-> None" if function does not return a value
+ferrox_py\architectures\api_gateway.py:13: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\databases\mongodb.py:8: error: Need type annotation for "client"  [var-annotated]
+ferrox_py\databases\mongodb.py:10: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\databases\mongodb.py:13: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\transports\graphql.py:8: error: Function is missing a return type annotation  [no-untyped-def]
+ferrox_py\transports\graphql.py:8: error: Function is missing a type annotation for one or more parameters  [no-untyped-def]
+Found 149 errors in 43 files (checked 69 source files)

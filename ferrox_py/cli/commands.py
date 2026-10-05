@@ -1,14 +1,15 @@
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator
 import argparse
 import sys
 from ferrox_py.cli.code_factory import generate_module
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser(description="Ferrox-Py CLI")
     subparsers = parser.add_subparsers(dest="command")
 
     # Command: generate
     gen_parser = subparsers.add_parser("generate", aliases=["g"], help="Generate a new resource")
-    gen_parser.add_argument("type", choices=["module", "controller", "provider"], help="Type of resource")
+    gen_parser.add_argument("type", choices=["module", "controller", "provider"], help="Type[Any] of resource")
     gen_parser.add_argument("name", type=str, help="Name of the resource")
 
     # Command: serve

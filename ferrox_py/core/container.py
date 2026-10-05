@@ -1,18 +1,18 @@
 import inspect
-from typing import Dict, Type, Any, Set
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Dict, Type, Any, Set
 from .provider import ProviderScope
 
 class Container:
-    def __init__(self):
-        self._providers: Dict[Type, Any] = {}
-        self._instances: Dict[Type, Any] = {}
+    def __init__(self) -> None:
+        self._providers: Dict[Type[Any], Any] = {}
+        self._instances: Dict[Type[Any], Any] = {}
         
-    def register(self, cls: Type) -> None:
+    def register(self, cls: Type[Any]) -> None:
         if not getattr(cls, "__ferrox_injectable__", False):
             raise ValueError(f"{cls.__name__} is not marked as @injectable")
         self._providers[cls] = cls
 
-    def register_module(self, module_cls: Type, resolved: Set[Type] = None) -> None:
+    def register_module(self, module_cls: Type[Any], resolved: Optional[Optional[Set[Type[Any]]]] = None) -> None:
         if resolved is None:
             resolved = set()
         if module_cls in resolved:
@@ -25,7 +25,7 @@ class Container:
         for provider in getattr(module_cls, "providers", []):
             self.register(provider)
 
-    def resolve(self, cls: Type) -> Any:
+    def resolve(self, cls: Type[Any]) -> Any:
         if cls not in self._providers:
             raise ValueError(f"Provider {cls.__name__} is not registered")
             

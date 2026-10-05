@@ -1,12 +1,13 @@
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator
 import time
 import asyncio
 from ferrox_py.core.provider import injectable
 
 @injectable()
 class RateLimiter:
-    def __init__(self):
+    def __init__(self) -> None:
         # In-memory token bucket storage (for distributed, use Redis)
-        self._buckets = {}
+        self._buckets: Dict[str, Any] = {}
         self._lock = asyncio.Lock()
 
     async def is_allowed(self, key: str, capacity: int = 10, refill_rate: float = 1.0) -> bool:

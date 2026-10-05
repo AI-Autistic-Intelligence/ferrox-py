@@ -1,23 +1,23 @@
 import asyncio
-from typing import Callable, List, Dict
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Callable, List, Dict
 from ferrox_py.core.provider import injectable
 from ferrox_py.core.errors import FerroxError
 
 class SagaStep:
-    def __init__(self, name: str, action: Callable, compensation: Callable = None):
+    def __init__(self, name: str, action: Callable[..., Any], compensation: Optional[Callable[..., Any]] = None) -> None:
         self.name = name
         self.action = action
         self.compensation = compensation
 
 @injectable()
 class SagaOrchestrator:
-    async def execute(self, steps: List[SagaStep]) -> Dict:
+    async def execute(self, steps: List[SagaStep]) -> Dict[Any, Any]:
         """
         Executes steps sequentially. If a step fails, triggers all compensations 
         for previously succeeded steps in reverse order.
         """
         completed_steps = []
-        state = {}
+        state: Dict[str, Any] = {}
         
         for step in steps:
             try:

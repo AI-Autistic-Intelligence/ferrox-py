@@ -1,3 +1,4 @@
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator
 import asyncio
 import uuid
 from contextlib import asynccontextmanager
@@ -6,13 +7,13 @@ from ferrox_py.core.errors import FerroxError
 
 @injectable()
 class DistributedLockManager:
-    def __init__(self):
+    def __init__(self) -> None:
         # In-memory mock for Redlock algorithm
-        self._locks = {}
+        self._locks: Dict[str, Any] = {}
         self._mutex = asyncio.Lock()
 
     @asynccontextmanager
-    async def acquire(self, key: str, ttl_ms: int = 10000, timeout_ms: int = 5000):
+    async def acquire(self, key: str, ttl_ms: int = 10000, timeout_ms: int = 5000) -> Any:
         """
         Acquires a distributed lock. If timeout is reached, raises FerroxError.
         """

@@ -1,3 +1,4 @@
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator
 from ferrox_py.core.provider import injectable
 import uuid
 import time
@@ -16,7 +17,7 @@ class TracingService:
     def get_current_trace_id(self) -> str:
         return trace_id_ctx_var.get()
         
-    def log_span(self, name: str, duration_ms: float):
+    def log_span(self, name: str, duration_ms: float) -> Any:
         trace_id = self.get_current_trace_id()
         # In a real setup, this exports to OpenTelemetry collector (Jaeger/Zipkin)
         print(f"[TRACE {trace_id}] Span '{name}' took {duration_ms:.2f}ms")

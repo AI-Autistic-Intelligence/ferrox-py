@@ -1,13 +1,13 @@
-from typing import List, Type, Any
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, List, Type, Any
 
 def module(
-    controllers: List[Type] = None,
-    providers: List[Type] = None,
-    imports: List[Type] = None,
-    exports: List[Type] = None,
+    controllers: Optional[Optional[List[Type[Any]]]] = None,
+    providers: Optional[Optional[List[Type[Any]]]] = None,
+    imports: Optional[Optional[List[Type[Any]]]] = None,
+    exports: Optional[Optional[List[Type[Any]]]] = None,
 ):
     """Decorator to group controllers and providers into a module."""
-    def decorator(cls: Type):
+    def decorator(cls: Type[Any]) -> Any:
         cls.__ferrox_module__ = True
         cls.controllers = controllers or []
         cls.providers = providers or []

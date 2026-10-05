@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, Any
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Dict, Any
 from .node import PipelineNode
 from structlog import get_logger
 
@@ -10,11 +10,11 @@ class DAG:
     Directed Acyclic Graph Orchestrator for Ferrox-Py Data Platforms.
     Executes ETL nodes concurrently based on their dependency graph.
     """
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self.name = name
         self.nodes: Dict[str, PipelineNode] = {}
         
-    def add_node(self, node: PipelineNode):
+    def add_node(self, node: PipelineNode) -> Any:
         if node.node_id in self.nodes:
             raise ValueError(f"Node {node.node_id} already exists in DAG {self.name}")
         self.nodes[node.node_id] = node
@@ -27,7 +27,7 @@ class DAG:
         logger.info("dag_started", dag=self.name)
         results = {}
         pending = set(self.nodes.keys())
-        completed = set()
+        completed: Set[str] = set()
         
         # Async tasks mapping
         tasks: Dict[str, asyncio.Task] = {}

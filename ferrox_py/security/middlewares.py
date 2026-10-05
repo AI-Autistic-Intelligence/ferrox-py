@@ -1,3 +1,4 @@
+from typing import Any, Optional, cast
 import re
 import json
 import logging
@@ -9,14 +10,14 @@ from .sentinel import SentinelThreatEngine
 logger = logging.getLogger("sentinel")
 
 class SentinelThreatEngineMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app, threat_engine: SentinelThreatEngine = None):
+    def __init__(self, app: Any, threat_engine: Optional[SentinelThreatEngine] = None):
         super().__init__(app)
         self.threat_engine = threat_engine or SentinelThreatEngine()
         self.sqli_pattern = re.compile(r'(\b(UNION|SELECT|INSERT|UPDATE|DELETE|DROP|ALTER)\b.*?\b(FROM|INTO|TABLE)\b)|(\'|%27).*?(--|#|\/\*)', re.IGNORECASE)
         self.xss_pattern = re.compile(r'(<(?:script|iframe|img|svg|object|embed).*?(?:src|onload|onerror)=)|(javascript:|vbscript:|data:text\/html)', re.IGNORECASE)
         self.rag_poisoning_pattern = re.compile(r'(ignore previous instructions|disregard|system prompt|you are now|forget everything|bypass|jailbreak)', re.IGNORECASE)
 
-    async def dispatch(self, request: Request, call_next) -> Response:
+    async def dispatch(self, request: Request, call_next: Any) -> Response:
         # We need to carefully consume the request body for inspection without preventing route from reading it
         try:
             body_bytes = await request.body()
@@ -25,7 +26,7 @@ class SentinelThreatEngineMiddleware(BaseHTTPMiddleware):
             body_str = ""
 
         # Reconstruct request for downstream since we consumed body
-        async def receive():
+        async def receive() -> Any:
             return {"type": "http.request", "body": body_bytes}
         request._receive = receive
 
@@ -57,7 +58,7 @@ class SentinelThreatEngineMiddleware(BaseHTTPMiddleware):
             logger.error(f"[SENTINEL WAF] BLOCK: {str(e)}")
             return JSONResponse({"error": "Forbidden", "message": "Ferrox Sentinel WAF Blocked Request: Security violation detected."}, status_code=403)
 
-        return await call_next(request)
+        return cast(Response, await call_next(request))
 
-    def flag_threat(self, reason: str):
+    def flag_threat(self, reason: str) -> None:
         raise Exception(reason)

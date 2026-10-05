@@ -1,5 +1,5 @@
 import asyncio
-from typing import AsyncGenerator, Callable
+from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, AsyncGenerator, Callable
 from fastapi.responses import StreamingResponse
 from ferrox_py.core.provider import injectable
 
@@ -9,7 +9,7 @@ class SSEService:
         """
         Creates a Server-Sent Events response from an async generator.
         """
-        async def format_sse():
+        async def format_sse() -> Any:
             async for data in generator_func():
                 # SSE format requires data: payload \n\n
                 yield f"data: {data}\n\n"
