@@ -1,8 +1,7 @@
-import pytest
-import asyncio
-from ferrox_py.security.sentinel import SentinelThreatEngine
 # from ferrox_py.data.singleflight import Singleflight
 from ferrox_py.security.paseto import PasetoV4Engine
+from ferrox_py.security.sentinel import SentinelThreatEngine
+
 
 def test_sentinel_entropy():
     engine = SentinelThreatEngine()

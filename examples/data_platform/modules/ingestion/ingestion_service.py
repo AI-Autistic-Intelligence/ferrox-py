@@ -1,7 +1,10 @@
+from typing import Any
+
 from ferrox_py_utils.pipelines.orchestrator import PipelineOrchestrator, PipelineStep
 from ferrox_py_utils.schemas.registry import SchemaRegistry
+
 from ferrox_py.core.provider import injectable
-from typing import Any
+
 
 @injectable()
 class IngestionService:

@@ -1,6 +1,7 @@
 import math
 from collections import Counter
 
+
 class SentinelThreatEngine:
     @staticmethod
     def calculate_shannon_entropy(data: str) -> float:

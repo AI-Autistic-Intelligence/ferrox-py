@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from fastapi import Request
+
 
 class Guard(ABC):
     @abstractmethod

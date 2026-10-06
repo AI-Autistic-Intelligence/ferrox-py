@@ -1,10 +1,12 @@
 import asyncio
 import json
+
 import websockets
-from .database import init_db, AsyncSessionLocal, CryptoTrade, CryptoDepth
 from pydantic import ValidationError
 from structlog import get_logger
-from .data_contracts import BinanceTradeContract, BinanceDepthContract, DataLineage
+
+from .data_contracts import BinanceDepthContract, BinanceTradeContract, DataLineage
+from .database import AsyncSessionLocal, CryptoDepth, CryptoTrade, init_db
 
 logger = get_logger()
 

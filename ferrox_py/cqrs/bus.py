@@ -1,11 +1,12 @@
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 T = TypeVar("T")
 R = TypeVar("R")
 
 class CQRSBus:
     def __init__(self) -> None:
-        self._handlers: Dict[str, Callable[..., Any]] = {}
+        self._handlers: dict[str, Callable[..., Any]] = {}
 
     def register(self, name: str, handler: Callable[..., Any]) -> Any:
         self._handlers[name] = handler

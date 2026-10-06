@@ -1,8 +1,10 @@
+from typing import Any
+
 from ferrox_py.core.provider import injectable
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Dict, Any, List
+
 
 class DataGridQuery:
-    def __init__(self, skip: int, take: int, filters: List[Dict[Any, Any]], sort: Dict[str, int]) -> None:
+    def __init__(self, skip: int, take: int, filters: list[dict[Any, Any]], sort: dict[str, int]) -> None:
         self.skip = skip
         self.take = take
         self.filters = filters
@@ -10,7 +12,7 @@ class DataGridQuery:
 
 @injectable()
 class DataGridHelper:
-    def parse_query(self, query_params: Dict[Any, Any]) -> DataGridQuery:
+    def parse_query(self, query_params: dict[Any, Any]) -> DataGridQuery:
         """
         Parses generic query params into a structured AST for database projection.
         Example query: ?skip=0&take=20&sort=name:-1&filter=status:eq:active

@@ -1,5 +1,7 @@
 import pytest
+
 from ferrox_py.cqrs.bus import CommandBus, EventBus
+
 
 @pytest.mark.asyncio
 async def test_command_bus():

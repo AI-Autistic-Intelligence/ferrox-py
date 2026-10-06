@@ -1,7 +1,9 @@
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Type
+from typing import Any
+
 from fastapi import APIRouter
 
-def generate_crud_controller(entity: Type[Any], service: Type[Any], prefix: str) -> Any:
+
+def generate_crud_controller(entity: type[Any], service: type[Any], prefix: str) -> Any:
     """
     Generates a standard FastAPI router with CRUD operations for an entity.
     """
@@ -16,11 +18,11 @@ def generate_crud_controller(entity: Type[Any], service: Type[Any], prefix: str)
         return {"action": "get_one", "id": id, "entity": entity.__name__}
 
     @router.post("/")
-    async def create(data: Dict[Any, Any]) -> Any:
+    async def create(data: dict[Any, Any]) -> Any:
         return {"action": "create", "data": data, "entity": entity.__name__}
         
     @router.put("/{id}")
-    async def update(id: str, data: Dict[Any, Any]) -> Any:
+    async def update(id: str, data: dict[Any, Any]) -> Any:
         return {"action": "update", "id": id, "data": data, "entity": entity.__name__}
         
     @router.delete("/{id}")

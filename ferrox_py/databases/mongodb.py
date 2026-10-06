@@ -1,12 +1,15 @@
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator
-from ferrox_py.core.provider import injectable
+from typing import Any
+
 from motor.motor_asyncio import AsyncIOMotorClient
+
+from ferrox_py.core.provider import injectable
+
 
 @injectable()
 class MongoService:
     def __init__(self, uri: str = "mongodb://localhost:27017") -> None:
         self.uri = uri
-        self.client = AsyncIOMotorClient(self.uri)
+        self.client = AsyncIOMotorClient(self.uri)  # type: ignore
 
     def get_database(self, name: str) -> Any:
         return self.client[name]

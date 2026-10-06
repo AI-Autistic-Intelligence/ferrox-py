@@ -1,7 +1,7 @@
-import pandas as pd
+from typing import Any
+
 import numpy as np
-import random
-from typing import Dict, Any, List
+import pandas as pd
 from structlog import get_logger
 
 logger = get_logger()
@@ -13,7 +13,7 @@ class QuantitativeAnalyticsService:
     For this demo, we simulate the historical distribution based on current data.
     """
     
-    def compute_order_book_imbalance(self, bids: List[List[float]], asks: List[List[float]]) -> Dict[str, Any]:
+    def compute_order_book_imbalance(self, bids: list[list[float]], asks: list[list[float]]) -> dict[str, Any]:
         """
         OBI = (BidVolume - AskVolume) / (BidVolume + AskVolume)
         Values near +1 indicate heavy buy-side spoofing/pressure.
@@ -48,7 +48,7 @@ class QuantitativeAnalyticsService:
             "ask_volume": round(ask_vol, 2)
         }
         
-    def detect_whale_anomalies(self, current_price: float, current_volume: float) -> Dict[str, Any]:
+    def detect_whale_anomalies(self, current_price: float, current_volume: float) -> dict[str, Any]:
         """
         Computes Z-Score against a simulated historical rolling window.
         Z = (x - mean) / std_dev
@@ -73,7 +73,7 @@ class QuantitativeAnalyticsService:
             "severity": "CRITICAL" if z_score > 5 else ("HIGH" if is_whale else "NORMAL")
         }
         
-    def compute_cross_asset_correlation(self, asset1_prices: List[float], asset2_prices: List[float]) -> float:
+    def compute_cross_asset_correlation(self, asset1_prices: list[float], asset2_prices: list[float]) -> float:
         """
         Pearson correlation coefficient between two assets.
         """

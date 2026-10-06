@@ -1,16 +1,17 @@
-from typing import Any, Optional, cast
-import re
-import json
 import logging
+import re
+from typing import Any, cast
+
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response, JSONResponse
+from starlette.responses import JSONResponse, Response
+
 from .sentinel import SentinelThreatEngine
 
 logger = logging.getLogger("sentinel")
 
 class SentinelThreatEngineMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: Any, threat_engine: Optional[SentinelThreatEngine] = None):
+    def __init__(self, app: Any, threat_engine: SentinelThreatEngine | None = None):
         super().__init__(app)
         self.threat_engine = threat_engine or SentinelThreatEngine()
         self.sqli_pattern = re.compile(r'(\b(UNION|SELECT|INSERT|UPDATE|DELETE|DROP|ALTER)\b.*?\b(FROM|INTO|TABLE)\b)|(\'|%27).*?(--|#|\/\*)', re.IGNORECASE)
@@ -55,7 +56,7 @@ class SentinelThreatEngineMiddleware(BaseHTTPMiddleware):
                 self.flag_threat("Path Traversal / Local File Inclusion attempt detected in URI.")
 
         except Exception as e:
-            logger.error(f"[SENTINEL WAF] BLOCK: {str(e)}")
+            logger.error(f"[SENTINEL WAF] BLOCK: {e!s}")
             return JSONResponse({"error": "Forbidden", "message": "Ferrox Sentinel WAF Blocked Request: Security violation detected."}, status_code=403)
 
         return cast(Response, await call_next(request))

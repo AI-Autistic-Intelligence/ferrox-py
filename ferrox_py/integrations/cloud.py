@@ -1,5 +1,6 @@
 from ferrox_py.core.provider import injectable
 
+
 @injectable()
 class CloudStorageService:
     async def upload_file(self, bucket: str, path: str, content: bytes) -> str:

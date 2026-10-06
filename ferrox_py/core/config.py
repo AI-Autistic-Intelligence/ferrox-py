@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings
+
 from ferrox_py.core.provider import injectable
+
 
 @injectable()
 class AppConfig(BaseSettings):

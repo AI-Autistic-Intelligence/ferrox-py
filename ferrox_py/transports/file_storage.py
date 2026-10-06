@@ -1,9 +1,11 @@
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator
-import aiofiles
 import os
+
+import aiofiles
 from fastapi import UploadFile
-from ferrox_py.core.provider import injectable
+
 from ferrox_py.core.errors import FerroxError
+from ferrox_py.core.provider import injectable
+
 
 @injectable()
 class FileStorageTransport:
@@ -14,7 +16,7 @@ class FileStorageTransport:
         if not os.path.exists(destination_dir):
             os.makedirs(destination_dir, exist_ok=True)
             
-        file_path = os.path.join(destination_dir, upload_file.filename)
+        file_path = os.path.join(destination_dir, upload_file.filename)  # type: ignore
         
         try:
             async with aiofiles.open(file_path, 'wb') as out_file:

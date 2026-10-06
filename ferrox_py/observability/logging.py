@@ -1,7 +1,8 @@
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator
-import structlog
 import uuid
 from contextvars import ContextVar
+from typing import Any
+
+import structlog
 
 correlation_id: ContextVar[str] = ContextVar("correlation_id", default="")
 
@@ -14,7 +15,7 @@ def get_logger(name: str) -> Any:
     )
     return structlog.get_logger(name)
 
-def set_correlation_id(cid: Optional[Optional[str]] = None) -> str:
+def set_correlation_id(cid: str | None = None) -> str:
     if not cid:
         cid = str(uuid.uuid4())
     correlation_id.set(cid)

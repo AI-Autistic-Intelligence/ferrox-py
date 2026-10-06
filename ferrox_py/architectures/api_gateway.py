@@ -1,13 +1,16 @@
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator
+from typing import Any
+
 import httpx
 from fastapi import Request, Response
-from ferrox_py.core.provider import injectable
+
 from ferrox_py.core.errors import FerroxError
+from ferrox_py.core.provider import injectable
+
 
 @injectable()
 class ApiGatewayRouter:
     def __init__(self) -> None:
-        self._routes: Dict[str, Any] = {}
+        self._routes: dict[str, Any] = {}
         # We share one client for connection pooling
         self._client = httpx.AsyncClient()
 
@@ -28,8 +31,8 @@ class ApiGatewayRouter:
         res = await self._client.request(
             method=request.method,
             url=url,
-            headers=Dict[Any, Any](request.headers),
+            headers=dict[Any, Any](request.headers),
             content=body
         )
         
-        return Response(content=res.content, status_code=res.status_code, headers=Dict[Any, Any](res.headers))
+        return Response(content=res.content, status_code=res.status_code, headers=dict[Any, Any](res.headers))

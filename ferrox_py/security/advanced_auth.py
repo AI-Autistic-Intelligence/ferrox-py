@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Dict
+
 from ferrox_py.core.provider import injectable
+
 
 class OAuth2Provider(ABC):
     @abstractmethod
@@ -8,7 +9,7 @@ class OAuth2Provider(ABC):
         pass
 
     @abstractmethod
-    async def exchange_code(self, code: str) -> Dict[str, str]:
+    async def exchange_code(self, code: str) -> dict[str, str]:
         pass
 
 @injectable()
@@ -20,6 +21,6 @@ class GoogleAuthProvider(OAuth2Provider):
     def get_auth_url(self) -> str:
         return f"https://accounts.google.com/o/oauth2/v2/auth?client_id={self.client_id}"
 
-    async def exchange_code(self, code: str) -> Dict[str, str]:
+    async def exchange_code(self, code: str) -> dict[str, str]:
         # Exchange logic with httpx would go here
         return {"access_token": "mock_google_token", "email": "user@example.com"}

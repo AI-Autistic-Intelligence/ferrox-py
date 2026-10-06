@@ -1,7 +1,10 @@
 from typing import Any
+
 from fastapi import FastAPI
-from ferrox_py.security.headers import MandatorySecurityHeadersMiddleware
+
 from ferrox_py.core.errors import setup_exception_handlers
+from ferrox_py.security.headers import MandatorySecurityHeadersMiddleware
+
 
 class FerroxApp:
     def __init__(self, title: str = "Ferrox-Py API", version: str = "0.1.0"):

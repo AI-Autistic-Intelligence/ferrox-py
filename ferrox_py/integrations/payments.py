@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
+
 from pydantic import BaseModel
-from typing import List
-from ferrox_py.core.provider import injectable
+
 from ferrox_py.core.errors import FerroxError
+from ferrox_py.core.provider import injectable
+
 
 class PaymentException(FerroxError):
     def __init__(self, message: str):
@@ -14,7 +16,7 @@ class PaymentItem(BaseModel):
     quantity: int
 
 class CheckoutRequest(BaseModel):
-    items: List[PaymentItem]
+    items: list[PaymentItem]
     currency: str = "USD"
     success_url: str
     cancel_url: str
@@ -23,7 +25,6 @@ class PaymentGateway(ABC):
     @abstractmethod
     async def create_checkout_session(self, request: CheckoutRequest) -> str:
         """Returns a checkout URL or session ID."""
-        pass
 
 @injectable()
 class DummyPaymentGateway(PaymentGateway):

@@ -1,6 +1,12 @@
-import pytest
 import asyncio
-from ferrox_py.resilience.circuit_breaker import CircuitBreaker, CircuitBreakerOpenException
+
+import pytest
+
+from ferrox_py.resilience.circuit_breaker import (
+    CircuitBreaker,
+    CircuitBreakerOpenException,
+)
+
 
 @pytest.mark.asyncio
 async def test_circuit_breaker():

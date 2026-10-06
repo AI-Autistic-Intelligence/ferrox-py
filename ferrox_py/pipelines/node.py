@@ -1,6 +1,7 @@
 import asyncio
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Callable, Any, List, Set
-from pydantic import BaseModel
+from collections.abc import Callable
+from typing import Any
+
 
 class PipelineNode:
     """
@@ -9,15 +10,15 @@ class PipelineNode:
     def __init__(self, node_id: str, action: Callable[..., Any]) -> None:
         self.node_id = node_id
         self.action = action
-        self.dependencies: Set[str] = set()
-        self.result: Optional[Optional[Any]] = None
+        self.dependencies: set[str] = set()
+        self.result: Any | None = None
         self.status: str = "PENDING"  # PENDING, RUNNING, SUCCESS, FAILED
         
     def depends_on(self, *node_ids: str) -> Any:
         for nid in node_ids:
             self.dependencies.add(nid)
             
-    async def execute(self, *args, **kwargs) -> Any:
+    async def execute(self, *args, **kwargs) -> Any:  # type: ignore
         self.status = "RUNNING"
         try:
             if asyncio.iscoroutinefunction(self.action):

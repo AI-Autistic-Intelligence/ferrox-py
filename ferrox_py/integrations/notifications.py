@@ -1,5 +1,6 @@
 from ferrox_py.core.provider import injectable
 
+
 @injectable()
 class NotificationService:
     async def push_notification(self, device_token: str, message: str) -> bool:

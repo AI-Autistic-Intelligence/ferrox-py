@@ -1,6 +1,8 @@
 import pytest
+
 from ferrox_py.pipelines.dag import DAG
 from ferrox_py.pipelines.node import PipelineNode
+
 
 @pytest.mark.asyncio
 async def test_dag_execution():

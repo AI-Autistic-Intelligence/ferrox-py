@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+
 from .live_service import LiveDataAggregatorService
+
 
 class LiveController:
     def __init__(self, container):

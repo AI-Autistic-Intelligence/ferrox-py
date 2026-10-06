@@ -1,7 +1,10 @@
 import asyncio
+
 from fastapi import APIRouter
-from ferrox_py.pipelines.node import PipelineNode
+
 from ferrox_py.pipelines.dag import DAG
+from ferrox_py.pipelines.node import PipelineNode
+
 
 class EtlController:
     def __init__(self, container):

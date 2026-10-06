@@ -1,8 +1,11 @@
 from fastapi import Request
-from ferrox_py.core.controllers import BaseController
+
 from ferrox_py.core.container import Container
+from ferrox_py.core.controllers import BaseController
 from ferrox_py.security.rate_limiting import RateLimiter
+
 from .ingestion_service import IngestionService
+
 
 class IngestionController(BaseController):
     def __init__(self, container: Container):

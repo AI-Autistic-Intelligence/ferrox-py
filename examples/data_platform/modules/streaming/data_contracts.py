@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
-from typing import Optional, List
+
+from pydantic import BaseModel, Field, field_validator
+
 
 class DataLineage(BaseModel):
     """
@@ -24,7 +25,7 @@ class BinanceTradeContract(BaseModel):
     quantity: float = Field(alias="q")
     is_buyer_maker: bool = Field(alias="m")
     
-    lineage: Optional[DataLineage] = None
+    lineage: DataLineage | None = None
 
     @field_validator("price", "quantity", mode="before")
     def parse_floats(cls, v):
@@ -35,8 +36,8 @@ class BinanceDepthContract(BaseModel):
     Validates Order Book Depth (Top 5 Bids/Asks) for detecting Spoofing and Imbalances.
     """
     last_update_id: int = Field(alias="lastUpdateId")
-    bids: List[List[float]]
-    asks: List[List[float]]
+    bids: list[list[float]]
+    asks: list[list[float]]
     symbol: str = "UNKNOWN" # Injected by the multiplexer
     
-    lineage: Optional[DataLineage] = None
+    lineage: DataLineage | None = None

@@ -1,5 +1,8 @@
 import inspect
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, TypeVar, Type, Dict, Set
+from typing import (
+    Any,
+    TypeVar,
+)
 
 T = TypeVar("T")
 
@@ -10,7 +13,7 @@ class ProviderScope:
 
 def injectable(scope: str = ProviderScope.SINGLETON) -> Any:
     """Decorator to mark a class as injectable."""
-    def decorator(cls: Type[T]) -> Type[T]:
+    def decorator(cls: type[T]) -> type[T]:
         if not inspect.isclass(cls):
             raise TypeError("@injectable can only be used on classes")
         cls.__ferrox_injectable__ = True  # type: ignore

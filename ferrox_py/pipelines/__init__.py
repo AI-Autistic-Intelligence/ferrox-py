@@ -1,4 +1,4 @@
-from .node import PipelineNode
 from .dag import DAG
+from .node import PipelineNode
 
-__all__ = ["PipelineNode", "DAG"]
+__all__ = ["DAG", "PipelineNode"]

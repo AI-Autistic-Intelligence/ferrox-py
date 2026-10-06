@@ -1,5 +1,7 @@
 from fastapi import Request
+
 from ferrox_py.core.provider import injectable
+
 
 @injectable()
 class WebhookValidator:

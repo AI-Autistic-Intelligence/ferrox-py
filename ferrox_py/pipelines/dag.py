@@ -1,7 +1,9 @@
 import asyncio
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Dict, Any
-from .node import PipelineNode
+from typing import Any
+
 from structlog import get_logger
+
+from .node import PipelineNode
 
 logger = get_logger()
 
@@ -12,14 +14,14 @@ class DAG:
     """
     def __init__(self, name: str) -> None:
         self.name = name
-        self.nodes: Dict[str, PipelineNode] = {}
+        self.nodes: dict[str, PipelineNode] = {}
         
     def add_node(self, node: PipelineNode) -> Any:
         if node.node_id in self.nodes:
             raise ValueError(f"Node {node.node_id} already exists in DAG {self.name}")
         self.nodes[node.node_id] = node
         
-    async def execute(self) -> Dict[str, Any]:
+    async def execute(self) -> dict[str, Any]:
         """
         Runs the DAG, respecting dependencies.
         Nodes with no pending dependencies are executed concurrently.
@@ -27,10 +29,10 @@ class DAG:
         logger.info("dag_started", dag=self.name)
         results = {}
         pending = set(self.nodes.keys())
-        completed: Set[str] = set()
+        completed: set[str] = set()
         
         # Async tasks mapping
-        tasks: Dict[str, asyncio.Task] = {}
+        tasks: dict[str, asyncio.Task] = {}  # type: ignore
         
         while pending:
             # Find nodes whose dependencies are all completed

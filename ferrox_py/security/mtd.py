@@ -1,6 +1,7 @@
-import hmac
 import hashlib
+import hmac
 import time
+
 
 class MTDEngine:
     """Moving Target Defense: Ephemeral HMAC Route Tokens."""
@@ -10,7 +11,7 @@ class MTDEngine:
 
     def generate_token(self, path: str) -> str:
         current_window = int(time.time()) // self.validity_window
-        msg = f"{path}:{current_window}".encode("utf-8")
+        msg = f"{path}:{current_window}".encode()
         return hmac.new(self.secret, msg, hashlib.sha256).hexdigest()
 
     def validate_token(self, path: str, token: str) -> bool:

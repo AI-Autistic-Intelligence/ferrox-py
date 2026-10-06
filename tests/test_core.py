@@ -1,6 +1,6 @@
-import pytest
 from ferrox_py.core.container import Container
-from ferrox_py.core.provider import injectable, ProviderScope
+from ferrox_py.core.provider import ProviderScope, injectable
+
 
 def test_container_singleton():
     container = Container()

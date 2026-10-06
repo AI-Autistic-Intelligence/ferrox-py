@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+
 from pydantic import BaseModel
-from ferrox_py.core.provider import injectable
+
 from ferrox_py.core.errors import FerroxError
+from ferrox_py.core.provider import injectable
+
 
 class MailException(FerroxError):
     def __init__(self, message: str):
@@ -14,11 +16,11 @@ class MailAttachment(BaseModel):
     mime_type: str
 
 class MailMessage(BaseModel):
-    to: List[str]
+    to: list[str]
     subject: str
-    template_id: Optional[str] = None
-    body_html: Optional[str] = None
-    attachments: Optional[List[MailAttachment]] = None
+    template_id: str | None = None
+    body_html: str | None = None
+    attachments: list[MailAttachment] | None = None
 
 class MailerService(ABC):
     @abstractmethod

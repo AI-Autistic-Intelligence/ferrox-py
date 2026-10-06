@@ -1,7 +1,9 @@
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator
+from typing import Any
+
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
+
 
 class MandatorySecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Any) -> Response:
@@ -18,4 +20,4 @@ class MandatorySecurityHeadersMiddleware(BaseHTTPMiddleware):
         if "Server" in response.headers:
             del response.headers["Server"]
 
-        return response
+        return response  # type: ignore

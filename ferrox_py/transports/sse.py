@@ -1,7 +1,10 @@
-import asyncio
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, AsyncGenerator, Callable
+from collections.abc import AsyncGenerator, Callable
+from typing import Any
+
 from fastapi.responses import StreamingResponse
+
 from ferrox_py.core.provider import injectable
+
 
 @injectable()
 class SSEService:

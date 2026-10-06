@@ -1,8 +1,8 @@
-from fastapi import APIRouter
-from ferrox_py.core.controllers import BaseController
 from ferrox_py.core.container import Container
-from ferrox_py.transports.datagrid import DataGridHelper
+from ferrox_py.core.controllers import BaseController
 from ferrox_py.databases.mongodb import MongoService
+from ferrox_py.transports.datagrid import DataGridHelper
+
 
 class CatalogController(BaseController):
     def __init__(self, container: Container):

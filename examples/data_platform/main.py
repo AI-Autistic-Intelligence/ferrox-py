@@ -1,14 +1,17 @@
+import os
+
 import uvicorn
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from ferrox_py.core.container import Container
-from modules.ingestion.ingestion_controller import IngestionController
-from modules.catalog.catalog_controller import CatalogController
-from modules.live_data.live_controller import LiveController
-from modules.etl.etl_controller import EtlController
+from fastapi.staticfiles import StaticFiles
 from modules.analytics.quant_controller import QuantController
-import os
+from modules.catalog.catalog_controller import CatalogController
+from modules.etl.etl_controller import EtlController
+from modules.ingestion.ingestion_controller import IngestionController
+from modules.live_data.live_controller import LiveController
+
+from ferrox_py.core.container import Container
+
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Ferrox Data Platform")

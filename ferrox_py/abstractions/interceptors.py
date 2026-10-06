@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable, Dict, List, Optional, Type, Set, cast, AsyncGenerator, Any, Callable
+from collections.abc import Callable
+from typing import Any
+
 
 class Interceptor(ABC):
     @abstractmethod
@@ -8,7 +10,6 @@ class Interceptor(ABC):
         Intercept the execution of a route handler.
         `next_handler` must be awaited to proceed to the controller.
         """
-        pass
 
 class LoggingInterceptor(Interceptor):
     async def intercept(self, request: Any, next_handler: Callable[..., Any]) -> Any:
@@ -19,5 +20,5 @@ class LoggingInterceptor(Interceptor):
         response = await next_handler()
         
         # Example after execution
-        print(f"Request completed.")
+        print("Request completed.")
         return response

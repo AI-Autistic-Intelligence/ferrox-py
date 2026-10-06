@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Any, Type
+from typing import Any
+
 from pydantic import BaseModel, ValidationError
+
 from ferrox_py.core.errors import FerroxError
+
 
 class PipeTransform(ABC):
     @abstractmethod
@@ -9,7 +12,7 @@ class PipeTransform(ABC):
         pass
 
 class ValidationPipe(PipeTransform):
-    def __init__(self, target_type: Type[BaseModel]):
+    def __init__(self, target_type: type[BaseModel]):
         self.target_type = target_type
 
     def transform(self, value: Any, metadata: Any = None) -> Any:

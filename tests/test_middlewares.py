@@ -1,6 +1,6 @@
-import pytest
 from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
+
 from ferrox_py.security.middlewares import SentinelThreatEngineMiddleware
 
 app = FastAPI()

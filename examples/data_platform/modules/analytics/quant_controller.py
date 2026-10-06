@@ -1,9 +1,13 @@
-from fastapi import APIRouter
-from ferrox_py.pipelines.node import PipelineNode
-from ferrox_py.pipelines.dag import DAG
-from .quant_service import QuantitativeAnalyticsService
-import httpx
 import random
+
+import httpx
+from fastapi import APIRouter
+
+from ferrox_py.pipelines.dag import DAG
+from ferrox_py.pipelines.node import PipelineNode
+
+from .quant_service import QuantitativeAnalyticsService
+
 
 class QuantController:
     def __init__(self, container):
