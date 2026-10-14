@@ -77,3 +77,4 @@ The Core module is intentionally designed to act as a hub that can be seamlessly
 - 🛠️ **ferrox-py-utils**: Integration for ETL tools, data pipelines, and connectors (e.g., S3, CSV).
 - 🔒 **ferrox-py-auth**: Integrates IAM, SSO, RBAC, and GDPR compliance features directly into the Auth Guards layer.
 - 💳 **ferrox-py-commerce**: Interfaces with Stripe/PayPal webhooks and enforces idempotency in the Transaction State.
+- 📊 **ferrox-py-aspyre**: Enterprise financial integrations for Dutch accounting (Exact Online Concurrency=1, Twinfield Session Pooler, SBR/BTW matrix, Anti-Ping-Pong Sagas).
