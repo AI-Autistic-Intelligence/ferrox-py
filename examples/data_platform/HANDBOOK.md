@@ -6,7 +6,7 @@ This document serves as the absolute source of truth for the **Quantitative Data
 
 As a Senior Engineer, I designed this platform to process High-Frequency Trading (HFT) and Quantitative Market Data. In this domain, a missed tick or a garbage collection pause translates directly to financial loss. This system represents the pinnacle of Python async engineering, proving that when Python is intimately coupled with the Linux kernel's event loop (`epoll`), it can rival compiled languages in I/O throughput.
 
-This handbook details the complete lifecycle of the platform: from the hardware interrupts to the userland Python AST, down to the persistence layers.
+This handbook details the complete lifecycle of the platform: from hardware interrupts to userland Python AST, down to persistence and observability.
 
 ---
 
@@ -16,8 +16,8 @@ Financial exchanges (like Binance, Kraken, and CME) blast millions of JSON or bi
 1. Maintain unyielding, non-blocking TCP connections.
 2. Parse variable-length streams instantaneously.
 3. Validate and sanitize payloads against malformed data and malicious injections (zero-trust).
-4. Persist data with strict ACID guarantees (preventing ledger corruption).
-5. Expose historical and real-time aggregations via GraphQL and REST without blocking the ingestor.
+4. Persist data with strict ACID guarantees (preventing ledger corruption) while supporting instantaneous in-memory execution for CI/CD test suites.
+5. Expose historical and real-time aggregations via GraphQL and REST without blocking ingestors.
 
 ---
 
@@ -58,81 +58,124 @@ JWT allows "Algorithm Confusion" (e.g., switching RSA to HMAC) because the token
 
 ---
 
-## 6. Persistence & ACID Strategy
+## 6. Persistence: Dual-Mode Architecture & ACID Guarantees
 
-### 6.1 PostgreSQL & asyncpg
-We explicitly abandoned Redis streams for this ledger to guarantee ACID durability.
-- **Binary Protocol Mapping**: We use `asyncpg`. It speaks the PostgreSQL frontend/backend protocol natively over TCP, bypassing the blocking `libpq` C-library. It maps binary IEEE 754 floats from the DB directly to Python types, bypassing UTF-8 string parsing overhead.
+```mermaid
+graph TD
+    Client[Controller / Service Call] --> RepoFactory[get_repository Factory]
+    RepoFactory -->|DATABASE_URL defined| PostgresEngine[SqlAlchemyRepository]
+    RepoFactory -->|MEMORY_DB=true or no DB| MemoryEngine[InMemoryRepository]
+    PostgresEngine --> PG[(PostgreSQL 16 Engine)]
+    MemoryEngine --> Dict[(Pre-Seeded Python Store)]
+```
+
+### 6.1 Dual-Mode Operation
+To satisfy enterprise testing standards (instant sub-second CI/CD runs with zero external Docker dependencies) while delivering production-grade ACID compliance, the persistence layer implements the `DataPlatformRepository` interface:
+1. **`InMemoryRepository`**: Thread-safe in-memory store pre-seeded with enterprise datasets (`dataset_weather`, `dataset_finance`, `dataset_ecommerce`). Used by default when `DATABASE_URL` is omitted.
+2. **`SqlAlchemyRepository`**: Connects to PostgreSQL 16 via SQLAlchemy engine. Operates tables `data_catalog_datasets`, `data_ingestion_records`, and `data_pipeline_runs`.
 
 ### 6.2 Write-Ahead Logging (WAL) Tuning
-During extreme volatility, inserting rows one by one kills performance due to disk fsync limits. We rely on SQLAlchemy's `AsyncSessionLocal` to batch inserts. The OS kernel's page cache holds the dirty pages, while Postgres `wal_writer_delay` groups WAL flushes, achieving sequential disk write speeds.
+During extreme volatility, inserting rows one by one kills performance due to disk fsync limits. We rely on SQLAlchemy's session batching. The OS kernel's page cache holds the dirty pages, while Postgres `wal_writer_delay` groups WAL flushes, achieving sequential disk write speeds.
 
 ---
 
-## 7. Programmer's Guide (Developer Workflow)
+## 7. Directed Acyclic Graph (DAG) Pipeline Engine
 
-### 7.1 Environment Setup
-```bash
-# 1. Create a pristine virtual environment
-python3.11 -m venv venv
-source venv/bin/activate
+The platform features an internal asynchronous DAG engine (`ferrox_py.pipelines.dag`) for orchestrating complex ETL workflows with parallel node execution and dependency resolution.
 
-# 2. Install dependencies (Requires ferrox-py>=1.0.1)
-# Use CFLAGS to optimize C-extensions for your CPU architecture
-CFLAGS="-O3 -march=native" pip install -r requirements.txt
+```mermaid
+graph LR
+    subgraph Extract ["Stage 1: Parallel Extraction"]
+        U[Node: extract_users]
+        S[Node: extract_sales]
+    end
 
-# 3. Environment Configuration (.env)
-DATABASE_URL="postgresql+asyncpg://ferrox:password@localhost:5432/quant_db"
-PASETO_SECRET_KEY="v4.local.YOUR_32_BYTE_SECRET_KEY_HERE"
+    subgraph Transform ["Stage 2: Aggregation"]
+        T[Node: transform]
+    end
+
+    subgraph Load ["Stage 3: Persistence"]
+        L[Node: load_to_warehouse]
+    end
+
+    U --> T
+    S --> T
+    T --> L
 ```
 
-### 7.2 Creating a New Ingestor (e.g., Coinbase)
-1. Navigate to `modules/streaming/`.
-2. Create `coinbase_ingestor.py`.
-3. Implement `async def stream_coinbase()` using the `websockets` library.
-4. Implement exponential backoff in a `while True:` loop to handle exchange disconnects.
-5. In `main.py`, add `asyncio.create_task(stream_coinbase())` to the `lifespan` context manager.
+### 7.1 DAG Code Example
+```python
+import asyncio
+from ferrox_py.pipelines.dag import DAG
+from ferrox_py.pipelines.node import PipelineNode
 
-### 7.3 Database Migrations (Alembic)
-Whenever `CryptoTrade` or `CryptoDepth` models are altered in `database.py`:
-```bash
-alembic revision --autogenerate -m "Added trade volume column"
-alembic upgrade head
+dag = DAG(name="Daily-Aggregations")
+
+# Parallel extraction nodes
+extract_users = PipelineNode("extract_users", lambda: {"active_users": 5240})
+extract_sales = PipelineNode("extract_sales", lambda: {"gross_sales": 128450.0})
+
+# Transformation node depends on both extracts
+async def transform_data():
+    await asyncio.sleep(0.05)
+    return {"aggregated": True, "currency": "USD"}
+
+transform = PipelineNode("transform", transform_data)
+transform.depends_on("extract_users", "extract_sales")
+
+# Load node depends on transformation
+async def load_to_warehouse():
+    await asyncio.sleep(0.05)
+    return {"loaded": True}
+
+load = PipelineNode("load", load_to_warehouse)
+load.depends_on("transform")
+
+dag.add_node(extract_users)
+dag.add_node(extract_sales)
+dag.add_node(transform)
+dag.add_node(load)
+
+# Asynchronous graph execution
+results = await dag.execute()
 ```
 
 ---
 
-## 8. User & DevOps Handbook (Operations)
+## 8. Observability: Structured JSON & W3C Trace Context
 
-### 8.1 OS & Sysctl Tuning for HFT
-Before deploying, the Linux kernel must be tuned:
-```bash
-# Prevent ephemeral port exhaustion
-sysctl -w net.ipv4.tcp_tw_reuse=1
-# Increase max connection backlog
-sysctl -w net.core.somaxconn=65535
-# Tune TCP read/write memory buffers
-sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
-sysctl -w net.ipv4.tcp_wmem="4096 65536 16777216"
-```
-
-### 8.2 Deployment: Docker & Uvicorn
-Serverless (AWS Lambda) is unacceptable due to long-lived WebSockets. Deploy on Kubernetes or Docker Swarm.
-```bash
-# Run with Uvicorn utilizing uvloop
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4 --loop uvloop --http httptools
-```
-*Warning: Running 4 workers spawns 4 background ingestors. Ensure your ingestors have a leader-election mechanism (e.g., Redis Lock) or extract the ingestors to a separate singleton microservice.*
+Every request is intercepted by `StructuredJsonLoggingMiddleware`:
+- Extracts incoming `x-correlation-id` or generates a UUID v4.
+- Extracts incoming `x-trace-id` or parses W3C `traceparent` (`00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01`).
+- Emits structured JSON log lines directly to `stdout`:
+  ```json
+  {
+    "timestamp": "2026-10-15T06:40:36.192708+00:00",
+    "level": "INFO",
+    "correlation_id": "cb455363-205e-4551-b8e0-73a010961557",
+    "trace_id": "ebb17a8b8f664083b43a8c8ed876d3c8",
+    "method": "GET",
+    "path": "/catalog/datasets",
+    "status_code": 200,
+    "duration_ms": 3.71,
+    "client_ip": "127.0.0.1"
+  }
+  ```
+- Reflects `x-correlation-id`, `x-trace-id`, and `x-response-time-ms` in HTTP response headers.
 
 ---
 
-## 9. Observability & Telemetry
+## 9. Operations & Docker Compose Deployment
 
-### 9.1 Prometheus Metrics
-The platform exposes `/metrics` for Prometheus scraping.
-- `ferrox_threats_blocked_total`: Counter for WAF interventions.
-- `ferrox_ingestion_latency_ms`: Histogram of time from WebSocket read to Postgres commit.
-- `sqlalchemy_connection_pool_active`: Gauge for DB saturation.
+### 9.1 Multi-Container Stack
+Start the complete infrastructure (App + PostgreSQL 16 + Redis 7 + Grafana):
+```bash
+docker compose up -d --build
+```
 
-### 9.2 Log Redaction
-Use `structlog` to output JSON lines for ELK/Datadog. Ensure `PASETO` tokens and passwords are redacted via custom processors before hitting `stdout`.
+### 9.2 Verification Endpoints
+- **OpenAPI Swagger UI**: `http://localhost:8000/docs`
+- **Prometheus Metrics**: `http://localhost:8000/metrics`
+- **Liveness Probe**: `http://localhost:8000/health/live`
+- **Readiness Probe**: `http://localhost:8000/health/ready`
+- **Grafana Dashboard**: `http://localhost:3001` (Credentials: `admin` / `admin`)

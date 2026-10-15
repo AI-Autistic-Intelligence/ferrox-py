@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  data-platform:
+    build:
+      context: ../..
+      dockerfile: examples/data_platform/Dockerfile
+    container_name: ferrox_data_platform
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - DATABASE_URL=postgresql://ferrox:ferrox_secret@postgres:5432/ferrox_data
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: ferrox_data_postgres
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=ferrox
+      - POSTGRES_PASSWORD=ferrox_secret
+      - POSTGRES_DB=ferrox_data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ferrox -d ferrox_data"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: ferrox_data_redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ferrox_data_grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafanadata:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  grafanadata:
